@@ -1,12 +1,161 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link href="/static/css/index.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalkPets</title>
+    <link rel="icon" href="favicon/icons8-стилизованные-компоненты-32.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <style>
+
+    </style>
 </head>
 <body>
-    <h1>Hello</h1>
+    <!-- Основной навбар -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="{% static 'img/лого.png' %}" alt="WalkPets" class="navbar-logo"> WalkPets
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarMain">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Магазины</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Ветклиники</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Приюты</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Новости</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">WP-zona</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Wiki-pets</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Форум</a>
+            </li>
 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
+                Услуги
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'services' %}">Выгул собак</a></li>
+                <li><a class="dropdown-item" href="">Передержка</a></li>
+                <li><a class="dropdown-item" href="">Груминг</a></li>
+              </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
+                Обьявления
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Посмотреть объявления</a></li>
+                <li><a class="dropdown-item" href="#">Разместить объявление</a></li>
+                <li><a class="dropdown-item" href="#">Удалить объявление</a></li>
+              </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="legalDropdown" role="button" data-bs-toggle="dropdown">
+                Юридическая помощь
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Консультации</a></li>
+                <li><a class="dropdown-item" href="#">Документы</a></li>
+                <li><a class="dropdown-item" href="#">Споры</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <div class="d-flex">
+            <a class="btn btn-outline-light" href="">
+              <img src="{% static 'img/аккаунт.png' %}" alt="Вход" width="20" height="20" class="me-1">
+              Вход
+            </a>
+          </div>
+        </div>
+      </div>
+  </nav>
+
+  <!-- Центрированная картинка -->
+  <div class="image-container">
+      <img src="{% static 'img/лого.png' %}" alt="WalkPets" class="main-image">
+  </div>
+
+  <div class="main-content">
+      <h1>Привет друг!</h1>
+      <p class="text-center">Добро пожаловать на наш сайт-сообщество любителей домашних животных. Здесь вы сможете найти всю полезную и интересную информацию необходимую для вас и вашего любимого питомца.</p>
+
+      <h2>О WalkPets</h2>
+
+      <h3>Наши преимущества:</h3>
+
+      <div class="advantages-container">
+        <div class="advantage">
+          <div class="advantage-icon">
+            <i class="bi bi-chat-dots"></i>
+          </div>
+          <h2>Онлайн чат</h2>
+          <p>Общайтесь онлайн в режиме реального времени с другими владельцами питомцев</p>
+        </div>
+
+        <div class="advantage">
+          <div class="advantage-icon">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <h2>WP-zona</h2>
+          <p>Находите лучшие места для прогулок и общения с питомцами в вашем городе</p>
+        </div>
+
+        <div class="advantage">
+          <div class="advantage-icon">
+            <i class="bi bi-shop"></i>
+          </div>
+          <h2>Магазины</h2>
+          <p>Совершайте покупки для ваших питомцев прямо через наш сайт с выгодными условиями</p>
+        </div>
+
+        <div class="advantage">
+          <div class="advantage-icon">
+            <i class="bi bi-tools"></i>
+          </div>
+          <h2>Услуги</h2>
+          <p>Заказывайте необходимые услуги: выгул, передержка, груминг и многое другое</p>
+        </div>
+
+        <div class="advantage">
+          <div class="advantage-icon">
+            <i class="bi bi-megaphone"></i>
+          </div>
+          <h2>Объявления</h2>
+          <p>Размещайте и просматривайте объявления о продаже, вязке или поиске питомцев</p>
+        </div>
+
+        <div class="advantage">
+          <div class="advantage-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h2>Юридическая помощь</h2>
+          <p>Получайте консультации по правовым вопросам, связанным с содержанием животных</p>
+        </div>
+      </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
