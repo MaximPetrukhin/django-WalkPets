@@ -3,6 +3,7 @@ h1, h2, h3 {
   margin-bottom: 20px;
   font-weight: bold;
   text-align: center;
+  font-family: 'Montserrat', sans-serif; /* Красивый шрифт для заголовков */
 }
 
 p {
@@ -20,7 +21,7 @@ body {
   background-repeat: repeat-y;
   background-attachment: fixed;
   background-position: right;
-  font-family: Arial, sans-serif;
+  font-family: 'Montserrat', sans-serif; /* Основной шрифт для всего сайта */
 }
 
 body::before {
@@ -46,7 +47,7 @@ body::before {
 
 .main-image {
   width: 50%;
-  max-width: 550px;
+  max-width: 600px;
   height: auto;
   border-radius: 12px;
   position: relative;
@@ -65,11 +66,47 @@ body::before {
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
+
+.welcome-message p {
+  font-size: 1.3rem;
+  color: #1e3c2e;
+  line-height: 1.8;
+  text-align: center;
+  margin: 25px auto; /* auto для горизонтального центрирования */
+  padding: 20px; /* Добавляем внутренние отступы */
+  font-weight: bold;
+  font-family: 'Playfair Display', serif;
+
+
+  /* Градиентная рамка */
+  border: 3px solid;
+  border-image: linear-gradient(45deg, #5a8f7b, #ffd56b) 1;
+  border-radius: 10px; /* Закругленные углы */
+
+  /* Тень */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+
+  /* Фон */
+  background-color: rgba(255, 255, 255, 0.8);
+
+  /* Максимальная ширина для лучшей читаемости */
+  max-width: 750px;
+
+  transition: all 0.3s ease;
+
+}
+
+.welcome-message p:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+  border-image: linear-gradient(45deg, #ffd56b, #5a8f7b) 1;
+}
+
 .main-content {
   max-width: 1200px;
   margin: 0 auto 40px;
   padding: 0 20px;
-  font-weight: bold;
+
 }
 
 /* Навбар */
