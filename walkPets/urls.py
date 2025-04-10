@@ -18,9 +18,15 @@ from django.contrib import admin
 from django.urls import path
 from services.views import index
 from services.views import services
+from services.views import privacy_policy
+from services.views import terms_of_use
+from services.views import cookie_policy
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name="index"),
     path('services/', services, name="services"),
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('terms-of-use/', terms_of_use, name='terms_of_use'),
+    path('cookie-policy/', cookie_policy, name='cookie_policy'),
 ]

@@ -215,9 +215,15 @@ body::before {
   padding: 40px 0 20px;
 }
 
+.footer p {
+ color:  #5a8f7b;
+}
+
 .footer-logo {
   width: 150px;
   height: auto;
+  border: 8px solid;
+  border-image: linear-gradient(45deg, #5a8f7b, #ffd56b) 1
 }
 
 .footer-title {
@@ -249,6 +255,52 @@ body::before {
 .footer-contacts {
   list-style: none;
   padding: 0;
+}
+
+/* Стили для формы подписки */
+.newsletter {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.newsletter-form {
+  margin-top: 10px;
+}
+
+.newsletter-input {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+
+
+.newsletter-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.newsletter-input:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  box-shadow: 0 0 0 0.1rem rgba(90, 143, 123, 0.25);
+}
+
+.newsletter-btn {
+  background-color: #5a8f7b;
+  border-color: #5a8f7b;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.newsletter-btn:hover {
+  background-color: #4a7f6b;
+  transform: scale(1.05);
+}
+
+.newsletter from-text {
+  padding: 5px;
+  color: #5a8f7b;
 }
 
 .footer-contacts li {
@@ -297,6 +349,36 @@ body::before {
 .footer-bottom {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.9rem;
+}
+
+
+/* Стили для юридических ссылок */
+.legal-links {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legal-links a {
+  color: rgba(255, 255, 255, 0.7) !important;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.legal-links a:hover {
+  color: #ffd56b !important;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .legal-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .legal-links a {
+    margin: 0 !important;
+  }
 }
 
 /* Стили для блока мобильных приложений */
