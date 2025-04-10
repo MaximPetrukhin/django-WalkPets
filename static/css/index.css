@@ -208,6 +208,153 @@ body::before {
   margin-bottom: 15px;
 }
 
+/* Стили для футера */
+.footer {
+  background-color: #343a40;
+  color: #fff;
+  padding: 40px 0 20px;
+}
+
+.footer-logo {
+  width: 150px;
+  height: auto;
+}
+
+.footer-title {
+  color: #ffd56b;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: #5a8f7b;
+}
+
+.footer-contacts {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-contacts li {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.footer-contacts i {
+  margin-right: 10px;
+  color: #5a8f7b;
+}
+
+.social-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.social-icon {
+  width: 32px; /* или любой другой размер по вашему желанию */
+  height: 32px;
+  transition: transform 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.1);
+}
+
+.newsletter .form-control {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+.newsletter .btn-primary {
+  background-color: #5a8f7b;
+  border-color: #5a8f7b;
+}
+
+.footer-bottom {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+/* Стили для блока мобильных приложений */
+.app-coming-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  margin-top: 30px;
+  border-radius: 10px;
+}
+
+.app-badge {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 5px;
+  transition: all 0.3s ease;
+  width: 160px;
+}
+
+.app-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.app-coming-soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+  color: white;
+  font-size: 0.95rem;
+  gap: 10px;
+}
+
+.app-coming-soon i {
+  font-size: 1.8rem;
+}
+
+.bi-google-play {
+  color: #689f38; /* Цвет Google Play */
+}
+
+.bi-apple {
+  color: #a6a6a6; /* Цвет App Store */
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .d-flex.justify-content-center.gap-4 {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px !important;
+  }
+
+  .app-badge {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
 /* Адаптация для мобильных */
 @media (max-width: 768px) {
   .advantages-container {
@@ -236,3 +383,4 @@ body::before {
     border-width: 4px;
   }
 }
+
