@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}?v=1.0">
+{% endblock %}
+
+{% block title %}Вход | WalkPets{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2><i class="bi bi-box-arrow-in-right"></i> Вход в аккаунт</h2>
+
+    {% if form.errors %}
+    <div class="form-errors">
+        Неправильное имя пользователя или пароль. Пожалуйста, попробуйте снова.
+    </div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            {% if "Вы вышли из системы" not in message.message %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_username">Имя пользователя</label>
+            <input type="text" name="username" class="form-control" id="id_username" required autofocus>
+        </div>
+
+        <div class="form-group">
+            <label for="id_password">Пароль</label>
+            <input type="password" name="password" class="form-control" id="id_password" required>
+        </div>
+
+        <div class="remember-me">
+            <input type="checkbox" id="remember" name="remember">
+            <label for="remember">Запомнить меня</label>
+        </div>
+
+        <button type="submit" class="btn-auth">Войти</button>
+
+        <div class="auth-links">
+            <a href="{% url 'password_reset' %}">Забыли пароль?</a> |
+            <a href="{% url 'users:register' %}">Регистрация</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

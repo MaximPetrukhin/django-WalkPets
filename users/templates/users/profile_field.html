@@ -1,0 +1,50 @@
+{# users/profile_field.html #}
+<div class="form-group">
+    <label for="{{ field_name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+
+    <input
+        type="{{ type|default:'text' }}"
+        id="{{ field_name }}"
+        name="{{ field_name }}"
+        value="{{ field_value|default:'' }}"
+        class="form-control"
+        placeholder="{{ placeholder|default:'' }}"
+        {% if type == 'date' %}max="{{ max_date|date:'Y-m-d'|default:'' }}"{% endif %}
+        {% if required %}required{% endif %}
+        {% for attr, value in attrs.items %}
+            {{ attr }}="{{ value }}"
+        {% endfor %}
+    >
+
+    {% if errors %}
+        <div class="error-message">
+            {{ errors|join:", " }}
+        </div>
+    {% endif %}
+</div>
+<style>
+    .required-mark {
+        color: #dc3545;
+        margin-left: 3px;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+
+    .form-text {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #6c757d;
+    }
+</style>

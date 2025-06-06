@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from services.models import Services
 
 def index(requests):
     return render(requests, "services/index.html")
@@ -14,3 +15,7 @@ def terms_of_use(request):
 
 def cookie_policy(request):
     return render(request, 'legal/cookie_policy.html')
+
+def service_list(request):  # Переименовано из services в service_list
+    services = Services.objects.filter(is_active=True)  # Добавлено получение услуг
+    return render(request, 'services/services.html', {'services': services})

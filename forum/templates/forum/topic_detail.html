@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ topic.title }} | Форум WalkPets{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum.css' %}?v=1.1">
+{% endblock %}
+
+{% block body_class %}forum-page{% endblock %}
+
+{% block content %}
+<div class="forum-container">
+    <div class="forum-topic-detail">
+        <!-- Основная тема -->
+        <article class="forum-main-topic">
+            <div class="forum-topic-header">
+                <span class="forum-category-badge">{{ topic.category.name }}</span>
+                <span class="forum-topic-date"><i
+                        class="bi bi-clock"></i> {{ topic.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+
+            <h1 class="forum-topic-title">{{ topic.title }}</h1>
+
+            <div class="forum-topic-author">
+                {% if topic.author.image %}
+                <img src="{{ topic.author.image.url }}" alt="{{ topic.author.username }}" class="forum-author-avatar">
+                {% else %}
+                <div class="forum-avatar-placeholder">{{ topic.author.username|first }}</div>
+                {% endif %}
+                <div class="forum-author-info">
+                    <span class="forum-author-name">{{ topic.author.username }}</span>
+                    <span class="forum-post-date">{{ topic.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+            </div>
+
+            <div class="forum-topic-content">
+                {{ topic.content|linebreaks }}
+            </div>
+
+            <div class="forum-topic-actions">
+                <button class="forum-like-btn" data-topic-id="{{ topic.id }}">
+                    <i class="bi bi-heart"></i> <span class="forum-like-count">{{ topic.likes.count }}</span>
+                </button>
+                <span class="forum-views-count">
+                    <i class="bi bi-eye"></i> <span class="forum-views-number">{{ topic.views }}</span> просмотров
+                </span>
+            </div>
+        </article>
+
+        <!-- Ответы -->
+        <section class="forum-replies">
+            <h2 class="forum-replies-title"><i class="bi bi-chat-square-text"></i> Ответы ({{ topic.posts.count }})</h2>
+
+            {% for post in topic.posts.all %}
+            {% include 'forum/includes/post_item.html' %}
+            {% empty %}
+            <div class="forum-no-replies">
+                <p>Пока нет ответов. Будьте первым!</p>
+            </div>
+            {% endfor %}
+
+            <!-- Форма ответа -->
+            {% if user.is_authenticated %}
+            <div class="forum-reply-form">
+                <h3 class="forum-reply-form-title">Оставить ответ</h3>
+                <form method="post"  class="forum-form">
+                    {% csrf_token %}
+                    <div class="forum-form-group">
+                        <textarea name="content" class="forum-form-control" rows="5" required
+                                  placeholder="Ваш ответ..."></textarea>
+                    </div>
+                    <button type="submit" class="forum-btn forum-btn-primary">Отправить</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="forum-alert forum-alert-info">
+                <i class="bi bi-info-circle"></i> <a href="{% url 'users:login' %}">Войдите</a>, чтобы оставлять ответы
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Логика для лайков
+        document.querySelectorAll('.forum-like-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const topicId = this.dataset.topicId;
+                const icon = this.querySelector('i');
+                const likeCount = this.querySelector('.forum-like-count');
+
+                fetch(`/forum/topic/${topicId}/like/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+        if(data.liked !== undefined) {  // изменено с data.success
+            likeCount.textContent = data.likes_count;
+            this.classList.toggle('forum-liked', data.liked);
+
+            if (data.liked) {
+                icon.classList.replace('bi-heart', 'bi-heart-fill');
+            } else {
+                icon.classList.replace('bi-heart-fill', 'bi-heart');
+            }
+        }
+    })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum.css' %}">
+{% endblock %}
+
+{% block body_class %}forum-page{% endblock %}
+
+{% block content %}
+<div class="forum-container">
+    <div class="forum-header">
+        <h1><i class="bi bi-chat-square-text"></i> Форум WalkPets</h1>
+        <div class="forum-actions">
+            {% if user.is_authenticated %}
+            <a href="{% url 'forum:create_topic' %}" class="btn forum-btn-primary">
+                <i class="bi bi-plus-circle"></i> Новая тема
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="forum-content">
+        <div class="forum-main">
+            <!-- Последние обсуждения -->
+            <section class="latest-topics">
+                <h2><i class="bi bi-clock-history"></i> Последние обсуждения</h2>
+
+                {% for topic in latest_topics %}
+                    {% include 'forum/includes/topic_item.html' %}
+                    {% if not forloop.last %}
+                    <div class="topic-divider"></div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="text-center mt-4">
+                    <a href="#" class="btn btn-outline-primary">Все обсуждения</a>
+                </div>
+            </section>
+
+            <!-- Категории -->
+            <section class="forum-categories">
+                <h2><i class="bi bi-collection"></i> Категории</h2>
+                <div class="forum-categories-grid">
+                    {% for category in categories %}
+                    <div class="forum-category-card">
+                        <h3>
+                            <a href="{% url 'forum:category_topics' category.slug %}">
+                                <i class="bi bi-folder2-open"></i> {{ category.name }}
+                            </a>
+                        </h3>
+                        <p>{{ category.description }}</p>
+                        <div class="forum-category-meta">
+                            <span><i class="bi bi-chat-square-text"></i> {{ category.topics.count }} тем</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <aside class="forum-sidebar">
+            <div class="forum-sidebar-card">
+                <h3 class="forum-sidebar-title"><i class="bi bi-info-circle"></i> Правила форума</h3>
+                <ol class="forum-rules-list">
+                    <li>Будьте вежливы и уважительны</li>
+                    <li>Запрещена реклама без согласования</li>
+                    <li>Не допускаются оскорбления</li>
+                    <li>Публикуйте в соответствующих разделах</li>
+                    <li>Проверяйте достоверность информации</li>
+                </ol>
+            </div>
+
+            <div class="forum-sidebar-card">
+                <h3 class="forum-sidebar-title"><i class="bi bi-trophy"></i> Лучшие участники</h3>
+                <div class="forum-top-users">
+                    {% for user in top_users %}
+                    <div class="forum-top-user">
+                        {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="{{ user.username }}" width="40" height="40" class="rounded-circle">
+                        {% else %}
+                        <div class="forum-avatar-placeholder">{{ user.username|first }}</div>
+                        {% endif %}
+                        <div>
+                            <div class="forum-top-user-name">{{ user.username }}</div>
+                            <div class="forum-top-user-posts">{{ user.topics.count }} тем</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

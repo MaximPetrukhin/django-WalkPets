@@ -1,0 +1,35 @@
+<div class="forum-topic-card">
+    <span class="forum-category-badge">{{ topic.category.name }}</span>
+
+    <h3 class="forum-topic-title">
+        <a href="{% url 'forum:topic_detail' topic.pk %}">{{ topic.title }}</a>
+    </h3>
+
+    <div class="forum-topic-content">
+        {{ topic.content|truncatewords:30 }}
+        <a href="{% url 'forum:topic_detail' topic.pk %}" class="read-more">Читать дальше →</a>
+    </div>
+
+    <div class="forum-topic-footer">
+        <div class="forum-topic-author">
+            {% if topic.author.image %}
+            <img src="{{ topic.author.image.url }}" alt="{{ topic.author.username }}" class="rounded-circle">
+            {% else %}
+            <div class="forum-avatar-placeholder">{{ topic.author.username|first }}</div>
+            {% endif %}
+            <span>{{ topic.author.username }}</span>
+        </div>
+
+        <div class="forum-topic-stats">
+            <button class="forum-like-btn" data-topic-id="{{ topic.id }}">
+                <i class="bi bi-heart"></i> <span class="like-count">{{ topic.likes.count }}</span>
+            </button>
+            <span>
+                <i class="bi bi-chat"></i> {{ topic.posts.count }}
+            </span>
+            <span>
+                <i class="bi bi-eye"></i> {{ topic.views }}
+            </span>
+        </div>
+    </div>
+</div>

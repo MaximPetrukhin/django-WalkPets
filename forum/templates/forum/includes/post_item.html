@@ -1,0 +1,25 @@
+<div class="post-card mb-3" id="post-{{ post.id }}">
+    <div class="post-header">
+        <div class="d-flex align-items-center">
+            {% if post.author.image %}
+            <img src="{{ post.author.image.url }}" alt="{{ post.author.username }}" class="me-2">
+            {% else %}
+            <i class="bi bi-person-circle me-2" style="font-size: 1.5rem;"></i>
+            {% endif %}
+            <div>
+                <strong>{{ post.author.username }}</strong>
+                <div class="text-muted small">
+                    <i class="bi bi-clock"></i> {{ post.created_at|date:"d.m.Y H:i" }}
+                    {% if post.created_at != post.updated_at %}
+                    (изменено: {{ post.updated_at|date:"d.m.Y H:i" }})
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="post-body">
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+    </div>
+</div>

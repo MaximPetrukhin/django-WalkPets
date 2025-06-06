@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} | WalkPets{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="forum-container">
+    <div class="forum-header">
+        <h1><i class="bi bi-folder2-open"></i> {{ category.name }}</h1>
+        <div class="forum-actions">
+            {% if user.is_authenticated %}
+            <a href="{% url 'forum:create_topic' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Новая тема
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="category-description">
+        <p>{{ category.description }}</p>
+    </div>
+
+    <div class="topics-list">
+        {% for topic in topics %}
+            {% include 'forum/includes/topic_item.html' %}
+        {% empty %}
+            <div class="alert alert-info">
+                В этой категории пока нет тем. Будьте первым!
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

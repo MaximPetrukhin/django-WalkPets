@@ -1,0 +1,169 @@
+/* Основной контейнер чата */
+.chat-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: #ffffff;
+    display: flex;
+    height: 80vh;
+}
+
+/* Боковая панель с участниками */
+.chat-sidebar {
+    width: 300px;
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Основная область сообщений */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Заголовок чата */
+.chat-header {
+    padding: 15px 20px;
+    background: #2c3e50;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.chat-title {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+/* Область сообщений */
+.messages-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f5f7fa;
+}
+
+/* Отдельное сообщение */
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    max-width: 80%;
+}
+
+.message-incoming {
+    align-self: flex-start;
+}
+
+.message-outgoing {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    margin: 0 10px;
+}
+
+.avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message-incoming .message-content {
+    background: white;
+    border-bottom-left-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.message-outgoing .message-content {
+    background: #e3f2fd;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* Панель ввода */
+.chat-input {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 30px;
+    outline: none;
+}
+
+.chat-input button {
+    margin-left: 10px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Список участников */
+.participant {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.participant-avatar {
+    margin-right: 10px;
+}
+
+.participant-name {
+    font-weight: 500;
+}
+
+.participant-status {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.status-active {
+    color: #28a745;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .chat-container {
+        flex-direction: column;
+        height: 90vh;
+    }
+
+    .chat-sidebar {
+        width: 100%;
+        height: 200px;
+    }
+}
