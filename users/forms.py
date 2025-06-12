@@ -1,32 +1,57 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
-from .models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.template.defaultfilters import filesizeformat
 from django.conf import settings
+from django.utils.safestring import mark_safe
 import re
 
+User = get_user_model()
+
+class AvatarWidget(forms.ClearableFileInput):
+    """Кастомный виджет для загрузки аватара с ограничениями"""
+    template_name = 'templates/widgets/avatar_widget.html'
+
+    def __init__(self, attrs=None):
+        default_attrs = {
+            'accept': 'image/jpeg, image/png, image/webp',
+            'class': 'avatar-file-input',
+        }
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__(attrs=default_attrs)
+
 class UserLoginForm(AuthenticationForm):
+    """Форма входа с запоминанием пользователя"""
     username = forms.CharField(
         widget=forms.TextInput(attrs={
-            'class': 'form-control py-4',
+            'class': 'form-control py-3',
             'placeholder': 'Введите имя пользователя',
             'autocomplete': 'username'
         })
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control py-4',
+            'class': 'form-control py-3',
             'placeholder': 'Введите пароль',
             'autocomplete': 'current-password'
         })
     )
+    remember_me = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        initial=True
+    )
 
 class UserRegistrationForm(UserCreationForm):
+    """Форма регистрации с дополнительной валидацией email"""
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
-            'class': 'form-control py-4',
+            'class': 'form-control py-3',
             'placeholder': 'Введите email',
             'autocomplete': 'email'
         }),
@@ -38,29 +63,40 @@ class UserRegistrationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
         widgets = {
             'username': forms.TextInput(attrs={
-                'class': 'form-control py-4',
+                'class': 'form-control py-3',
                 'placeholder': 'Введите имя пользователя',
                 'autocomplete': 'username'
             }),
             'password1': forms.PasswordInput(attrs={
-                'class': 'form-control py-4',
+                'class': 'form-control py-3',
                 'placeholder': 'Введите пароль',
                 'autocomplete': 'new-password'
             }),
             'password2': forms.PasswordInput(attrs={
-                'class': 'form-control py-4',
+                'class': 'form-control py-3',
                 'placeholder': 'Подтвердите пароль',
                 'autocomplete': 'new-password'
             }),
         }
 
     def clean_email(self):
+        """Проверка уникальности email"""
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
             raise ValidationError("Пользователь с таким email уже существует")
         return email
 
 class UserProfileForm(UserChangeForm):
+    """Форма редактирования профиля с кастомными полями"""
+    email = forms.EmailField(
+        disabled=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control py-2',
+            'readonly': True,
+            'autocomplete': 'email'
+        })
+    )
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email', 'phone', 'birth_date', 'image')
@@ -75,11 +111,6 @@ class UserProfileForm(UserChangeForm):
                 'placeholder': 'Введите фамилию',
                 'autocomplete': 'family-name'
             }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control py-2',
-                'readonly': True,
-                'autocomplete': 'email'
-            }),
             'phone': forms.TextInput(attrs={
                 'class': 'form-control py-2',
                 'placeholder': '+7 (___) ___ __ __',
@@ -91,19 +122,19 @@ class UserProfileForm(UserChangeForm):
                 'type': 'date',
                 'autocomplete': 'bday'
             }, format='%Y-%m-%d'),
-            'image': forms.FileInput(attrs={
-                'class': 'form-control-file d-none',
-                'accept': 'image/jpeg, image/png, image/webp',
-                'id': 'avatar-input'
-            })
+            'image': AvatarWidget()
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.birth_date:
             self.initial['birth_date'] = self.instance.birth_date.strftime('%Y-%m-%d')
+        self.fields['email'].initial = self.instance.email
+        self.fields['password'].help_text = ''
+        self.fields['password'].widget = forms.HiddenInput()
 
     def clean_phone(self):
+        """Валидация номера телефона"""
         phone = self.cleaned_data.get('phone')
         if phone:
             cleaned = re.sub(r'[^\d+]', '', phone)
@@ -113,6 +144,7 @@ class UserProfileForm(UserChangeForm):
         return phone
 
     def clean_image(self):
+        """Проверка размера загружаемого изображения"""
         image = self.cleaned_data.get('image')
         if image and image.size > settings.MAX_UPLOAD_SIZE:
             raise ValidationError(

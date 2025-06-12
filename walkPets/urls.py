@@ -22,6 +22,7 @@ from services.views import index, service_list, privacy_policy, terms_of_use, co
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name="index"),
@@ -31,13 +32,11 @@ urlpatterns = [
     path('cookie-policy/', cookie_policy, name='cookie_policy'),
     path('users/', include('users.urls')),
     path('forum/', include('forum.urls')),
-
-
+    path('wp-zona/', include('wpzona.urls')),
 
     # Аутентификация (совместимость со стандартными URL Django)
     path('accounts/login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-
 
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
@@ -62,8 +61,6 @@ urlpatterns = [
          ),
          name='password_reset_complete'),
 ]
-
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,27 @@
+<div class="avatar-upload-container">
+    {% if widget.is_initial %}
+        <div class="avatar-preview">
+            <img src="{{ widget.value.url }}" alt="Текущий аватар" class="avatar-image">
+        </div>
+        <div class="avatar-actions">
+            <span class="avatar-filename">{{ widget.initial_text }}: {{ widget.value.name }}</span>
+            {% if not widget.required %}
+                <label class="avatar-remove">
+                    <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}">
+                    {{ widget.clear_checkbox_label }}
+                </label>
+            {% endif %}
+        </div>
+    {% endif %}
+    <div class="avatar-upload-buttons">
+        <label for="{{ widget.attrs.id }}" class="btn-upload">
+            Загрузить новый аватар
+        </label>
+        {% if widget.is_initial %}
+            <button type="submit" name="delete_avatar" class="btn-delete">
+                Удалить аватар
+            </button>
+        {% endif %}
+        <input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+    </div>
+</div>

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'services',
     'forum',
+    'wpzona',
 
 ]
 
@@ -175,4 +176,8 @@ DEFAULT_FROM_EMAIL = "noreply@walkpets.ru"
 
 # settings.py
 MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
+
+OPENWEATHER_API_KEY = "174aea51ab36a4f548b80df73bd6e7cc"
+
+
 

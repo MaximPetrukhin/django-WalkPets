@@ -5,145 +5,92 @@
 <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 {% endblock %}
 
-{% block title %}Личный кабинет | WalkPets{% endblock %}
-
 {% block content %}
-{% if messages %}
-<div class="messages-container">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">
-        <i class="bi {% if message.tags == 'success' %}bi-check-circle{% else %}bi-exclamation-triangle{% endif %}"></i>
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+<div class="profile-container py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Боковая панель -->
+            <div class="col-lg-4 mb-4">
+                <div class="profile-sidebar card">
+                    <div class="card-body text-center">
+                        <div class="avatar-wrapper mb-3">
+                            {% if user.image %}
+                                <img src="{{ user.image.url }}" class="avatar-img" alt="Аватар">
+                            {% else %}
+                                <div class="avatar-placeholder">{{ user.get_initials }}</div>
+                            {% endif %}
+                        </div>
+                        <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                        <p class="text-muted mb-3">@{{ user.username }}</p>
 
-<div class="profile-container">
-    <div class="profile-card">
-        <div class="avatar-section">
-            <div class="avatar-wrapper">
-                <div class="avatar-container">
-                    {% if user.image %}
-                    <img id="avatar-preview" src="{{ user.image.url }}" alt="Аватар пользователя" class="avatar-image">
-                    {% else %}
-                    <div id="avatar-preview" class="avatar-placeholder">
-                        {{ user.get_initials }}
+                        <form method="post" enctype="multipart/form-data" class="mb-3">
+                            {% csrf_token %}
+                            <label class="btn btn-outline-primary btn-sm mb-2">
+                                <i class="bi bi-camera me-1"></i>Сменить аватар
+                                <input type="file" name="image" accept="image/*" hidden>
+                            </label>
+                            {% if user.image %}
+                                <button type="submit" name="delete_avatar" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i>Удалить
+                                </button>
+                            {% endif %}
+                        </form>
+
+                        <div class="social-links">
+                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Telegram"><i class="bi bi-telegram"></i></a>
+                        </div>
                     </div>
-                    {% endif %}
                 </div>
-
-                <form id="avatar-form" method="post" enctype="multipart/form-data"
-                      data-url="{% url 'users:upload_avatar' %}">
-                    {% csrf_token %}
-                    <div class="avatar-buttons">
-                        <label for="avatar-input" class="btn-upload" title="Загрузить новое фото">
-                            <i class="bi bi-camera"></i>
-                        </label>
-                        {% if user.image %}
-                        <button type="button" id="delete-avatar" class="btn-delete" title="Удалить аватар"
-                                data-url="{% url 'users:delete_avatar' %}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                        {% endif %}
-                        <input type="file" id="avatar-input" name="image" accept="image/jpeg, image/png, image/webp">
-                    </div>
-                </form>
             </div>
-        </div> <!-- Закрывающий тег для avatar-section -->
 
-        <!-- Модальное окно подтверждения удаления - перенесено за пределы avatar-section -->
-        <div id="delete-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Подтвердите удаление</h3>
-                    <button type="button" class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Вы уверены, что хотите удалить аватар?</p>
-                </div>
-                <div class="modal-footer">
-                    <button id="cancel-delete" class="btn btn-secondary">Отмена</button>
-                    <button id="confirm-delete" class="btn btn-danger">Удалить</button>
+            <!-- Основное содержимое -->
+            <div class="col-lg-8">
+                <div class="profile-form-card card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Настройки профиля</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Имя</label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Фамилия</label>
+                                    {{ form.last_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    {{ form.email }}
+                                    <small class="text-muted">Изменить email можно через поддержку</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Телефон</label>
+                                    {{ form.phone }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Дата рождения</label>
+                                    {{ form.birth_date }}
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" name="save_profile" class="btn btn-primary">
+                                        <i class="bi bi-check-circle me-1"></i>Сохранить изменения
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <h1 class="profile-title">Личный кабинет</h1>
-
-        <div class="user-credentials">
-            <p><strong>Логин:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-        </div>
-
-        <form method="post" id="profile-form" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="profile-grid">
-                <div class="profile-info-card">
-                    <h2 class="section-title">Основная информация</h2>
-
-                    <div class="form-group">
-                        <label for="id_first_name" class="form-label">Имя</label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}
-                        <div class="error-message">{{ form.first_name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_last_name" class="form-label">Фамилия</label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}
-                        <div class="error-message">{{ form.last_name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_birth_date" class="form-label">Дата рождения</label>
-                        {{ form.birth_date }}
-                        {% if form.birth_date.errors %}
-                        <div class="error-message">{{ form.birth_date.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="profile-info-card">
-                    <h2 class="section-title">Контактные данные</h2>
-
-                    <div class="form-group">
-                        <label for="id_username" class="form-label">Логин</label>
-<!--                        <input type="text" id="id_username" value="{{ user.username }}" class="form-control" readonly>-->
-                        {{username}}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_email" class="form-label">Email</label>
-                        <input type="email" id="id_email" value="{{ user.email }}" class="form-control" readonly>
-                        <small class="form-text">*Для изменения email обратитесь в поддержку</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_phone" class="form-label">Телефон</label>
-                        {{ form.phone }}
-                        {% if form.phone.errors %}
-                        <div class="error-message">{{ form.phone.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-save">Сохранить изменения</button>
-            </div>
-        </form>
     </div>
 </div>
-
-<div id="toast-container" class="toast-container"></div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
-<script src="{% static 'js/avatar-upload.js' %}"></script>
+<script src="{% static 'js/profile_1.js' %}"></script>
 {% endblock %}

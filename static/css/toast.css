@@ -1,48 +1,29 @@
+/* Стили для уведомлений */
 .toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
 }
 
 .toast {
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: slide-in 0.3s ease-out;
-    max-width: 300px;
-    opacity: 1;
-    transition: opacity 0.5s;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  color: white;
+  box-shadow: var(--shadow-sm);
+  animation: slide-in 0.3s ease-out;
+  max-width: 300px;
 }
 
-.toast-success {
-    background-color: #28a745;
-}
+.toast-success { background-color: #28a745; }
+.toast-error { background-color: #dc3545; }
+.toast-info { background-color: #17a2b8; }
+.toast-warning { background-color: #ffc107; color: #212529; }
 
-.toast-error {
-    background-color: #dc3545;
-}
-
-.toast-info {
-    background-color: #17a2b8;
-}
-
-.toast-warning {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.fade-out {
-    opacity: 0;
-}
+.fade-out { opacity: 0; }
 
 @keyframes slide-in {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }

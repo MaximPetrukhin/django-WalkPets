@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.contrib import messages
-from django.core.files.storage import default_storage
 from .forms import UserLoginForm, UserRegistrationForm, UserProfileForm
-from django.utils import timezone
+from django.core.files.storage import default_storage
+from django.core.exceptions import PermissionDenied
 
 
 def login(request):
+    """Обработка входа пользователя"""
+    if request.user.is_authenticated:
+        return redirect('users:profile')
+
     if request.method == "POST":
         form = UserLoginForm(data=request.POST)
         if form.is_valid():
@@ -16,109 +19,80 @@ def login(request):
             password = form.cleaned_data['password']
             user = authenticate(username=username, password=password)
 
-            if user:
+            if user is not None:
                 auth_login(request, user)
-                if not form.cleaned_data.get('remember'):
-                    request.session.set_expiry(0)  # Сессия закончится при закрытии браузера
+                if not form.cleaned_data.get('remember_me'):
+                    request.session.set_expiry(0)
                 messages.success(request, f'Добро пожаловать, {username}!')
-                return redirect('users:profile')
+                next_url = request.GET.get('next', 'users:profile')
+                return redirect(next_url)
+            else:
+                messages.error(request, 'Неверное имя пользователя или пароль')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
 
-        messages.error(request, 'Неверное имя пользователя или пароль')
+        return render(request, "users/login.html", {'form': form})
 
-    return render(request, "users/login.html", {
-        'form': UserLoginForm()
-    })
+    return render(request, "users/login.html", {'form': UserLoginForm()})
 
 
 def register(request):
+    """Обработка регистрации нового пользователя"""
+    if request.user.is_authenticated:
+        return redirect('users:profile')
+
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            auth_login(request, user)
-            messages.success(request, "Вы успешно зарегистрировались!")
-            return redirect('index')
+            try:
+                user = form.save()
+                auth_login(request, user)
+                messages.success(request, "Вы успешно зарегистрировались!")
+                return redirect('users:profile')
+            except Exception as e:
+                messages.error(request, f'Ошибка при регистрации: {str(e)}')
+        return render(request, "users/register.html", {'form': form})
 
-    return render(request, "users/register.html", {
-        'form': UserRegistrationForm()
-    })
-
+    return render(request, "users/register.html", {'form': UserRegistrationForm()})
 
 
 @login_required
 def profile(request):
+    """Редактирование профиля пользователя"""
     if request.method == 'POST':
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль успешно обновлен!')
-            return redirect('users:profile')
-    else:
-        form = UserProfileForm(instance=request.user)
 
-    return render(request, 'users/profile.html', {
-        'form': form,
-        'now': timezone.now().date()
-    })
+        if 'delete_avatar' in request.POST:
+            try:
+                if request.user.image:
+                    default_storage.delete(request.user.image.path)
+                    request.user.image = None
+                    request.user.save()
+                    messages.success(request, 'Аватар успешно удалён!')
+            except Exception as e:
+                messages.error(request, f'Ошибка при удалении аватара: {str(e)}')
+            return redirect('users:profile')
+
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, 'Профиль успешно обновлён!')
+                return redirect('users:profile')
+            except Exception as e:
+                messages.error(request, f'Ошибка при обновлении профиля: {str(e)}')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
+
+        return render(request, 'users/profile.html', {'form': form})
+
+    form = UserProfileForm(instance=request.user)
+    return render(request, 'users/profile.html', {'form': form})
 
 
 def logout(request):
+    """Выход пользователя из системы"""
+    if not request.user.is_authenticated:
+        raise PermissionDenied
     auth_logout(request)
-    messages.info(request, 'Вы вышли из системы')
+    messages.info(request, 'Вы успешно вышли из системы')
     return redirect('index')
-
-
-@login_required
-def upload_avatar(request):
-    if request.method == 'POST' and request.FILES.get('image'):
-        try:
-            if request.user.image:
-                # Удаляем старый аватар
-                request.user.image.delete(save=False)
-
-            # Сохраняем новый аватар
-            request.user.image = request.FILES['image']
-            request.user.save()
-
-            return JsonResponse({
-                'status': 'success',
-                'avatar_url': request.user.image.url
-            })
-        except Exception as e:
-            return JsonResponse({
-                'status': 'error',
-                'message': str(e)
-            }, status=500)
-    return JsonResponse({
-        'status': 'error',
-        'message': 'Неверный запрос'
-    }, status=400)
-
-
-@login_required
-def delete_avatar(request):
-    try:
-        user = request.user
-
-        if not user.image:
-            return JsonResponse({
-                'success': False,
-                'error': 'Аватар не найден'
-            }, status=404)
-
-        # Удаляем файл и очищаем поле
-        user.image.delete(save=False)
-        user.image = None
-        user.save()
-
-        return JsonResponse({
-            'success': True,
-            'initials': user.get_initials(),
-            'message': 'Аватар успешно удалён'
-        })
-
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)

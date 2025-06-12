@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}WalkPets - WPzona{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/wpzona.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="wpzona-container">
+    <h1>WPzona</h1>
+    <p class="text-center mb-4">Ваш гид по pet-friendly местам и погоде для комфортных прогулок с питомцем</p>
+
+    <!-- Блок погоды -->
+    <div class="weather-card">
+        <h2><i class="bi bi-cloud-sun"></i> Погода</h2>
+        {% if weather %}
+        <div class="weather-details">
+            <img src="http://openweathermap.org/img/wn/{{ weather.weather.0.icon }}@2x.png" alt="Weather icon" class="weather-icon">
+            <div>
+                <div class="weather-temp">{{ weather.main.temp|floatformat:0 }}°C</div>
+                <div class="weather-desc">{{ weather.weather.0.description|capfirst }}</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <p><i class="bi bi-droplet"></i> Влажность: {{ weather.main.humidity }}%</p>
+            </div>
+            <div class="col-md-4">
+                <p><i class="bi bi-wind"></i> Ветер: {{ weather.wind.speed }} м/с</p>
+            </div>
+            <div class="col-md-4">
+                <p><i class="bi bi-thermometer"></i> Ощущается как: {{ weather.main.feels_like|floatformat:0 }}°C</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            Не удалось загрузить данные о погоде. Пожалуйста, попробуйте позже.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Блок карты -->
+    <div class="map-container">
+        <h2><i class="bi bi-map"></i> Pet-friendly места</h2>
+        <p>Найдите лучшие места для прогулок с вашим питомцем</p>
+        <div id="petMap"></div>
+    </div>
+
+    <!-- Форма для добавления мест -->
+    <div class="place-form">
+        <h3><i class="bi bi-plus-circle"></i> Добавить новое место</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_name" class="form-label">Название места</label>
+                    {{ form.name }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_address" class="form-label">Адрес</label>
+                    {{ form.address }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_latitude" class="form-label">Широта</label>
+                    {{ form.latitude }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_longitude" class="form-label">Долгота</label>
+                    {{ form.longitude }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="id_description" class="form-label">Описание</label>
+                {{ form.description }}
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Сохранить место
+            </button>
+        </form>
+    </div>
+
+    <!-- Список мест -->
+    <div class="place-list">
+        <h3><i class="bi bi-geo-alt"></i> Последние добавленные места</h3>
+        {% if places %}
+        <div class="row">
+            {% for place in places %}
+            <div class="col-md-6">
+                <div class="place-item">
+                    <h5>{{ place.name }}</h5>
+                    <p>{{ place.description }}</p>
+                    <p class="text-muted"><small>{{ place.address }}</small></p>
+                    <button class="btn btn-sm btn-outline-secondary view-on-map"
+                            data-lat="{{ place.latitude }}"
+                            data-lng="{{ place.longitude }}">
+                        Показать на карте
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Пока нет добавленных мест. Будьте первым, кто добавит pet-friendly место!
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById('petMap');
+    if (!mapElement) {
+        console.error('Карта не найдена: элемент #petMap отсутствует');
+        return;
+    }
+
+    // Инициализация карты с проверкой координат
+    const map = L.map('petMap', {
+        center: [55.75, 37.61],
+        zoom: 13,
+        zoomControl: true
+    });
+
+    // Добавление базового слоя
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+        detectRetina: true
+    }).addTo(map);
+
+    // Добавление маркеров
+    {% for place in places %}
+    {% if place.latitude and place.longitude %}
+    try {
+        const marker = L.marker([{{ place.latitude }}, {{ place.longitude }}], {
+            title: "{{ place.name|escapejs }}"
+        }).addTo(map);
+
+        marker.bindPopup(`
+            <h4>{{ place.name|escapejs }}</h4>
+            <p>{{ place.description|default:"Нет описания"|escapejs }}</p>
+            <small>{{ place.address|escapejs }}</small>
+        `);
+    } catch(e) {
+        console.error('Ошибка создания маркера для места {{ place.id }}:', e);
+    }
+    {% endif %}
+    {% endfor %}
+
+    // Добавление контроля геолокации
+    L.control.locate({
+        position: 'topleft',
+        strings: {
+            title: "Мое местоположение"
+        },
+        locateOptions: {
+            maxZoom: 16
+        }
+    }).addTo(map);
+
+    // Обработка кнопок "Показать на карте"
+    document.querySelectorAll('.view-on-map').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lat = parseFloat(this.dataset.lat);
+            const lng = parseFloat(this.dataset.lng);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                map.flyTo([lat, lng], 15);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

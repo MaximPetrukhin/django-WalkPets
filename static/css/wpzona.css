@@ -1,0 +1,153 @@
+/* Стили для страницы wpzona */
+.wpzona-container {
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 40px;
+  border: 3px solid;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+}
+
+/* Карточка погоды */
+.weather-card {
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg-light), #e9ecef);
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--primary-color);
+}
+
+.weather-icon {
+  width: 60px;
+  height: 60px;
+  margin-right: 15px;
+}
+
+.weather-details {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.weather-temp {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+.weather-desc {
+  font-size: 1.2rem;
+}
+
+.weather-card i {
+  color: var(--primary-color);
+  margin-right: 8px;
+}
+
+/* Карта */
+#petMap {
+  height: 500px;
+  width: 100%;
+  border-radius: 10px;
+  border: 2px solid var(--primary-color);
+  margin: 20px 0;
+}
+
+.leaflet-container {
+  background: var(--bg-light);
+}
+
+.leaflet-control a {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.leaflet-control a:hover {
+  background-color: var(--bg-light);
+}
+
+.leaflet-popup-content h3 {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+/* Форма */
+.place-form {
+  background-color: var(--bg-light);
+  padding: 25px;
+  border-radius: 10px;
+  margin-top: 30px;
+  border: 1px solid #dee2e6;
+}
+
+.place-form label {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.place-form .form-control {
+  background-color: white;
+  border: 1px solid #ced4da;
+}
+
+.place-form .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(90, 143, 123, 0.25);
+}
+
+.place-form .btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.place-form .btn-primary:hover {
+  background-color: var(--primary-color-dark, #4a7f6b);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Список мест */
+.place-item {
+  background-color: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  border-left: 3px solid var(--primary-color);
+}
+
+.place-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.place-item h5 {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.place-item .btn-outline-secondary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.place-item .btn-outline-secondary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  #petMap { height: 350px; }
+  .weather-details { flex-direction: column; align-items: flex-start; }
+  .weather-icon { margin-bottom: 10px; margin-right: 0; }
+  .wpzona-container { padding: 20px; }
+  .place-form { padding: 15px; }
+}
+
+@media (max-width: 576px) {
+  #petMap { height: 300px; }
+  .weather-temp { font-size: 2rem; }
+  .weather-desc { font-size: 1rem; }
+}
