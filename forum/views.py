@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse  # Добавлен reverse
 from django.http import JsonResponse
 from django.db.models import Count
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from .models import Category, Topic, Post
 from .forms import TopicForm, PostForm
 from django.contrib.auth import get_user_model
-
 
 User = get_user_model()
 
@@ -43,7 +44,6 @@ class CategoryTopicsView(ListView):
         context['category'] = self.category
         return context
 
-
 class TopicDetailView(DetailView):
     model = Topic
     template_name = 'forum/topic_detail.html'
@@ -74,9 +74,10 @@ class TopicDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        if not request.user.is_authenticated or request.user != self.object.author:
-            self.object.views += 1
-            self.object.save()
+        if request.user.is_authenticated and request.user == self.object.author:
+            return response
+        self.object.views += 1
+        self.object.save()
         return response
 
 class CreateTopicView(LoginRequiredMixin, CreateView):
@@ -92,7 +93,6 @@ class CreateTopicView(LoginRequiredMixin, CreateView):
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
-    http_method_names = ['post']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -102,8 +102,19 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('forum:topic_detail', kwargs={'pk': self.kwargs['pk']})
 
+class AllTopicsView(ListView):
+    model = Topic
+    template_name = 'forum/all_topics.html'
+    context_object_name = 'topics'
+    paginate_by = 10  # Можно настроить пагинацию
+
+    def get_queryset(self):
+        return Topic.objects.all().order_by('-created_at')
+
+@require_POST
+@login_required
 def like_topic(request, pk):
-    if request.method == 'POST' and request.user.is_authenticated:
+    try:
         topic = get_object_or_404(Topic, pk=pk)
         if request.user in topic.likes.all():
             topic.likes.remove(request.user)
@@ -112,7 +123,12 @@ def like_topic(request, pk):
             topic.likes.add(request.user)
             liked = True
         return JsonResponse({
+            'status': 'success',
             'liked': liked,
-            'likes_count': topic.total_likes()
+            'likes_count': topic.likes.count()  # Исправлено с total_likes()
         })
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)

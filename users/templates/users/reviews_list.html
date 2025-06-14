@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Отзывы пользователей</h2>
+                {% if user.is_authenticated %}
+                <a href="{% url 'users:create_review' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Написать отзыв
+                </a>
+                {% endif %}
+            </div>
+
+            {% if reviews %}
+            <div class="reviews-list">
+                {% for review in reviews %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <h5 class="card-title">{{ review.author.username }}</h5>
+                            <div class="text-muted small">{{ review.created_at|date:"d.m.Y H:i" }}</div>
+                        </div>
+                        <div class="mb-2">
+                            {% for _ in review.stars %}
+                            <i class="bi bi-star-fill text-warning"></i>
+                            {% endfor %}
+                            {% for _ in review.empty_stars %}
+                            <i class="bi bi-star text-warning"></i>
+                            {% endfor %}
+                        </div>
+                        <p class="card-text">{{ review.text }}</p>
+                        {% if user == review.author or user.is_superuser %}
+                        <div class="mt-3">
+                            <form method="post" action="{% url 'users:delete_review' review.id %}">
+                                {% csrf_token %}
+                                {% if user == review.author or user.is_superuser %}
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#confirmDeleteModal">
+                                    <i class="bi bi-trash"></i> Удалить отзыв
+                                </button>
+                                <form method="post" action="{% url 'users:delete_review' review.id %}" class="d-none">
+                                    {% endif %}
+                                    {% csrf_token %}
+                                </form>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Пока нет отзывов. Будьте первым!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

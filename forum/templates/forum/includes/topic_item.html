@@ -1,34 +1,44 @@
 <div class="forum-topic-card">
-    <span class="forum-category-badge">{{ topic.category.name }}</span>
-
-    <h3 class="forum-topic-title">
-        <a href="{% url 'forum:topic_detail' topic.pk %}">{{ topic.title }}</a>
-    </h3>
-
-    <div class="forum-topic-content">
-        {{ topic.content|truncatewords:30 }}
-        <a href="{% url 'forum:topic_detail' topic.pk %}" class="read-more">Читать дальше →</a>
+    <div class="topic-header">
+        <span class="topic-category">{{ topic.category.name }}</span>
+        <span class="topic-date">
+            <i class="bi bi-clock"></i> {{ topic.created_at|date:"d.m.Y H:i" }}
+        </span>
     </div>
 
-    <div class="forum-topic-footer">
-        <div class="forum-topic-author">
+    <h3 class="topic-title">
+        <a href="{% url 'forum:topic_detail' topic.id %}">{{ topic.title }}</a>
+    </h3>
+
+    <div class="topic-content">
+        {{ topic.content|truncatechars:120 }}
+        <a href="{% url 'forum:topic_detail' topic.id %}" class="read-more">
+            Читать полностью <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="topic-footer">
+        <div class="author-info">
             {% if topic.author.image %}
-            <img src="{{ topic.author.image.url }}" alt="{{ topic.author.username }}" class="rounded-circle">
+            <img src="{{ topic.author.image.url }}" alt="{{ topic.author.username }}" class="author-avatar">
             {% else %}
-            <div class="forum-avatar-placeholder">{{ topic.author.username|first }}</div>
+            <div class="avatar-placeholder">
+                {{ topic.author.username|first|upper }}
+            </div>
             {% endif %}
-            <span>{{ topic.author.username }}</span>
+            <span class="author-name">{{ topic.author.username }}</span>
         </div>
 
-        <div class="forum-topic-stats">
-            <button class="forum-like-btn" data-topic-id="{{ topic.id }}">
-                <i class="bi bi-heart"></i> <span class="like-count">{{ topic.likes.count }}</span>
+        <div class="topic-stats">
+            <button class="like-btn" data-topic-id="{{ topic.id }}">
+                <i class="bi {% if user in topic.likes.all %}bi-heart-fill liked{% else %}bi-heart{% endif %}"></i>
+                <span class="like-count">{{ topic.likes.count }}</span>
             </button>
-            <span>
-                <i class="bi bi-chat"></i> {{ topic.posts.count }}
+            <span class="stat-item">
+                <i class="bi bi-chat-square-text"></i> {{ topic.posts.count }}
             </span>
-            <span>
-                <i class="bi bi-eye"></i> {{ topic.views }}
+            <span class="stat-item">
+                <i class="bi bi-eye-fill"></i> {{ topic.views }}
             </span>
         </div>
     </div>

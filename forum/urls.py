@@ -5,12 +5,14 @@ from .views import (
     TopicDetailView,
     CreateTopicView,
     CreatePostView,
-    like_topic
+    like_topic,
+    AllTopicsView
 )
 
 app_name = 'forum'
 
 urlpatterns = [
+    path('all-topics/', AllTopicsView.as_view(), name='all_topics'),
     path('', ForumIndexView.as_view(), name='forum_index'),
     path('category/<slug:slug>/', CategoryTopicsView.as_view(), name='category_topics'),
     path('topic/<int:pk>/', TopicDetailView.as_view(), name='topic_detail'),

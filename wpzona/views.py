@@ -1,41 +1,76 @@
-import requests
-from django.conf import settings
-from django.shortcuts import render
-from .models import PetFriendlyPlace
-from .forms import PetFriendlyPlaceForm
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.conf import settings
+import requests
+from .models import Region, PetFriendlyPlace, PetFriendlyPlaceSubmission
+from .forms import RegionSelectForm, PetFriendlyPlaceSubmissionForm
+
+
+def select_region(request):
+    if request.method == 'POST':
+        form = RegionSelectForm(request.POST)
+        if form.is_valid():
+            region = form.cleaned_data['region']
+            request.session['selected_region_id'] = region.id
+            return redirect('wpzona:wpzona')
+    else:
+        form = RegionSelectForm()
+
+    return render(request, 'wpzona/select_region.html', {'form': form})
 
 
 def wpzona(request):
-    # Получение данных о погоде
+    # Проверяем, выбран ли регион
+    region_id = request.session.get('selected_region_id')
+    if not region_id:
+        return redirect('wpzona:select_region')
+
+    try:
+        region = Region.objects.get(id=region_id)
+    except Region.DoesNotExist:
+        return redirect('wpzona:select_region')
+
+    # Получаем погоду для региона
     weather_data = None
-    API_KEY = settings.OPENWEATHER_API_KEY
-    city = "Москва"
     try:
         weather_response = requests.get(
-            f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric&lang=ru"
+            f"http://api.openweathermap.org/data/2.5/weather?"
+            f"lat={region.latitude}&lon={region.longitude}"
+            f"&appid={settings.OPENWEATHER_API_KEY}"
+            f"&units=metric&lang=ru"
         )
-        weather_data = weather_response.json()
+        if weather_response.status_code == 200:
+            weather_data = weather_response.json()
     except requests.RequestException as e:
         print(f"Ошибка при запросе погоды: {e}")
 
-    # Обработка формы
-    if request.method == 'POST':
-        form = PetFriendlyPlaceForm(request.POST)
+    # Обработка формы добавления места
+    if request.method == 'POST' and request.user.is_authenticated:
+        form = PetFriendlyPlaceSubmissionForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            # Редирект после успешного сохранения чтобы избежать повторной отправки формы
+            submission = form.save(commit=False)
+            submission.user = request.user
+            submission.region = region
+            submission.save()
             return redirect('wpzona:wpzona')
     else:
-        form = PetFriendlyPlaceForm()
+        form = PetFriendlyPlaceSubmissionForm()
 
-    # Получение мест
-    places = PetFriendlyPlace.objects.all().order_by('-created_at')[:10]  # Последние 10 мест
+    # Получаем одобренные места для региона
+    places = PetFriendlyPlace.objects.filter(submission__region=region)
 
     context = {
-        'title': 'WP-zona - Pet-friendly места',
+        'title': f'WPzona - {region.name}',
         'weather': weather_data,
         'form': form,
         'places': places,
+        'region': region,
     }
     return render(request, 'wpzona/wpzona.html', context)
+
+
+@staff_member_required
+def approve_submission(request, submission_id):
+    # Здесь должна быть логика одобрения заявки
+    pass

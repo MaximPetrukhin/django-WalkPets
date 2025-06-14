@@ -21,9 +21,9 @@
 .toast-info { background-color: #17a2b8; }
 .toast-warning { background-color: #ffc107; color: #212529; }
 
-.fade-out { opacity: 0; }
+.toast-fade-out { opacity: 0; }
 
-@keyframes slide-in {
+@keyframes toast-slide-in {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
 }

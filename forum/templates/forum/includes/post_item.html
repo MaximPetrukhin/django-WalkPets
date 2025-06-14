@@ -1,25 +1,32 @@
-<div class="post-card mb-3" id="post-{{ post.id }}">
-    <div class="post-header">
-        <div class="d-flex align-items-center">
-            {% if post.author.image %}
-            <img src="{{ post.author.image.url }}" alt="{{ post.author.username }}" class="me-2">
-            {% else %}
-            <i class="bi bi-person-circle me-2" style="font-size: 1.5rem;"></i>
-            {% endif %}
-            <div>
-                <strong>{{ post.author.username }}</strong>
-                <div class="text-muted small">
-                    <i class="bi bi-clock"></i> {{ post.created_at|date:"d.m.Y H:i" }}
-                    {% if post.created_at != post.updated_at %}
-                    (изменено: {{ post.updated_at|date:"d.m.Y H:i" }})
-                    {% endif %}
-                </div>
+<div class="forum-post">
+    <div class="post-author">
+        {% if post.author.image %}
+        <img src="{{ post.author.image.url }}" alt="{{ post.author.username }}" class="author-avatar">
+        {% else %}
+        <div class="avatar-placeholder">
+            {{ post.author.username|first|upper }}
+        </div>
+        {% endif %}
+        <div class="author-details">
+            <div class="author-name">{{ post.author.username }}</div>
+            <div class="post-date">
+                <i class="bi bi-clock"></i> {{ post.created_at|date:"d.m.Y H:i" }}
             </div>
         </div>
     </div>
-    <div class="post-body">
-        <div class="post-content">
-            {{ post.content|linebreaks }}
-        </div>
+
+    <div class="post-content">
+        {{ post.content|linebreaksbr }}
     </div>
+
+    {% if user == post.author or user.is_superuser %}
+    <div class="post-actions">
+        <form method="post" action="{% url 'forum:delete_post' post.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Удалить
+            </button>
+        </form>
+    </div>
+    {% endif %}
 </div>

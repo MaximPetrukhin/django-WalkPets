@@ -4,7 +4,87 @@
 {% block title %}Новая тема | WalkPets{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forum.css' %}">
+<link rel="stylesheet" href="{% static 'css/forum.css' %}?v=1.2">
+<style>
+    .modern-topic-form {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 2px solid #5a8f7b;
+        box-shadow: 0 5px 15px rgba(90, 143, 123, 0.1);
+    }
+
+    .modern-topic-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .modern-topic-form label {
+        display: block;
+        font-weight: 600;
+        color: #5a8f7b;
+        margin-bottom: 0.5rem;
+    }
+
+    .modern-topic-form input,
+    .modern-topic-form select,
+    .modern-topic-form textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #5a8f7b;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .modern-topic-form input:focus,
+    .modern-topic-form select:focus,
+    .modern-topic-form textarea:focus {
+        border-color: #4a7f6b;
+        box-shadow: 0 0 0 3px rgba(90, 143, 123, 0.2);
+        outline: none;
+    }
+
+    .modern-topic-form textarea {
+        min-height: 200px;
+        resize: vertical;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-create {
+        background: linear-gradient(45deg, #5a8f7b, #4a7f6b);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(90, 143, 123, 0.3);
+    }
+
+    .btn-cancel {
+        background: white;
+        color: #5a8f7b;
+        border: 2px solid #5a8f7b;
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background: #f8f9fa;
+        transform: translateY(-3px);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -13,31 +93,43 @@
         <h1><i class="bi bi-plus-circle"></i> Новая тема</h1>
     </div>
 
-    <form method="post" class="topic-form">
-        {% csrf_token %}
+    <div class="modern-topic-form">
+        <form method="post">
+            {% csrf_token %}
 
-        <div class="form-group">
-            <label for="{{ form.title.id_for_label }}">Заголовок</label>
-            {{ form.title }}
-            {{ form.title.errors }}
-        </div>
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">Заголовок темы</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <div class="error-message">{{ form.title.errors }}</div>
+                {% endif %}
+            </div>
 
-        <div class="form-group">
-            <label for="{{ form.category.id_for_label }}">Категория</label>
-            {{ form.category }}
-            {{ form.category.errors }}
-        </div>
+            <div class="form-group">
+                <label for="{{ form.category.id_for_label }}">Категория</label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                <div class="error-message">{{ form.category.errors }}</div>
+                {% endif %}
+            </div>
 
-        <div class="form-group">
-            <label for="{{ form.content.id_for_label }}">Содержание</label>
-            {{ form.content }}
-            {{ form.content.errors }}
-        </div>
+            <div class="form-group">
+                <label for="{{ form.content.id_for_label }}">Содержание</label>
+                {{ form.content }}
+                {% if form.content.errors %}
+                <div class="error-message">{{ form.content.errors }}</div>
+                {% endif %}
+            </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Создать тему</button>
-            <a href="{% url 'forum:forum_index' %}" class="btn btn-outline-secondary">Отмена</a>
-        </div>
-    </form>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-create">
+                    <i class="bi bi-check-circle"></i> Создать тему
+                </button>
+                <a href="{% url 'forum:forum_index' %}" class="btn btn-cancel">
+                    <i class="bi bi-x-circle"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

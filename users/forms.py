@@ -6,8 +6,34 @@ from django.template.defaultfilters import filesizeformat
 from django.conf import settings
 from django.utils.safestring import mark_safe
 import re
+from .models import Review
+
 
 User = get_user_model()
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['text', 'rating']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Напишите ваш отзыв здесь...'
+            }),
+            'rating': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1,
+                'max': 5,
+                'type': 'number'
+            })
+        }
+        labels = {
+            'text': 'Ваш отзыв',
+            'rating': 'Оценка (1-5 звезд)'
+        }
+
 
 class AvatarWidget(forms.ClearableFileInput):
     """Кастомный виджет для загрузки аватара с ограничениями"""

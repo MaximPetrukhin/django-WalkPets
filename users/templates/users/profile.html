@@ -6,18 +6,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="profile-container py-5">
+<div class="prof-container py-5">
     <div class="container">
         <div class="row">
             <!-- Боковая панель -->
             <div class="col-lg-4 mb-4">
-                <div class="profile-sidebar card">
+                <div class="prof-sidebar card">
                     <div class="card-body text-center">
-                        <div class="avatar-wrapper mb-3">
+                        <div class="prof-avatar-wrapper mb-3">
                             {% if user.image %}
-                                <img src="{{ user.image.url }}" class="avatar-img" alt="Аватар">
+                                <img src="{{ user.image.url }}" class="prof-avatar-img" alt="Аватар">
                             {% else %}
-                                <div class="avatar-placeholder">{{ user.get_initials }}</div>
+                                <div class="prof-avatar-placeholder">{{ user.get_initials }}</div>
                             {% endif %}
                         </div>
                         <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
@@ -25,18 +25,18 @@
 
                         <form method="post" enctype="multipart/form-data" class="mb-3">
                             {% csrf_token %}
-                            <label class="btn btn-outline-primary btn-sm mb-2">
+                            <label class="btn prof-btn-outline-primary btn-sm mb-2">
                                 <i class="bi bi-camera me-1"></i>Сменить аватар
                                 <input type="file" name="image" accept="image/*" hidden>
                             </label>
                             {% if user.image %}
-                                <button type="submit" name="delete_avatar" class="btn btn-outline-danger btn-sm">
+                                <button type="submit" name="delete_avatar" class="btn prof-btn-outline-danger btn-sm">
                                     <i class="bi bi-trash me-1"></i>Удалить
                                 </button>
                             {% endif %}
                         </form>
 
-                        <div class="social-links">
+                        <div class="prof-social-links">
                             <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Facebook"><i class="bi bi-facebook"></i></a>
                             <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Instagram"><i class="bi bi-instagram"></i></a>
                             <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Telegram"><i class="bi bi-telegram"></i></a>
@@ -47,7 +47,7 @@
 
             <!-- Основное содержимое -->
             <div class="col-lg-8">
-                <div class="profile-form-card card">
+                <div class="prof-form-card card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Настройки профиля</h5>
                     </div>
@@ -56,28 +56,53 @@
                             {% csrf_token %}
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Имя</label>
+                                    <label class="prof-form-label">Имя</label>
                                     {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="prof-invalid-feedback">
+                                            {{ form.first_name.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Фамилия</label>
+                                    <label class="prof-form-label">Фамилия</label>
                                     {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="prof-invalid-feedback">
+                                            {{ form.last_name.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Email</label>
+                                    <label class="prof-form-label">Email</label>
                                     {{ form.email }}
-                                    <small class="text-muted">Изменить email можно через поддержку</small>
+                                    <small class="prof-form-text">Изменить email можно через поддержку</small>
+                                    {% if form.email.errors %}
+                                        <div class="prof-invalid-feedback">
+                                            {{ form.email.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Телефон</label>
+                                    <label class="prof-form-label">Телефон</label>
                                     {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                        <div class="prof-invalid-feedback">
+                                            {{ form.phone.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Дата рождения</label>
+                                    <label class="prof-form-label">Дата рождения</label>
                                     {{ form.birth_date }}
+                                    {% if form.birth_date.errors %}
+                                        <div class="prof-invalid-feedback">
+                                            {{ form.birth_date.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-12 mt-4">
-                                    <button type="submit" name="save_profile" class="btn btn-primary">
+                                    <button type="submit" name="save_profile" class="btn prof-btn-primary">
                                         <i class="bi bi-check-circle me-1"></i>Сохранить изменения
                                     </button>
                                 </div>

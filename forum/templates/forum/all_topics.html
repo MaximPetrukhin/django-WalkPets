@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum.css' %}">
+{% endblock %}
+
+{% block body_class %}forum-page{% endblock %}
+
+{% block content %}
+<div class="forum-container">
+    <div class="forum-header">
+        <h1><i class="bi bi-chat-square-text"></i> Все обсуждения</h1>
+    </div>
+
+    <div class="topics-list">
+        {% for topic in topics %}
+            {% include 'forum/includes/topic_item.html' %}
+            {% if not forloop.last %}
+            <div class="topic-divider"></div>
+            {% endif %}
+        {% empty %}
+            <div class="alert alert-info">
+                Пока нет тем для обсуждения. Будьте первым!
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="forum-pagination">
+        <!-- Пагинация -->
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

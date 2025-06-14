@@ -1,10 +1,10 @@
 /* Основные стили профиля */
-.profile-container {
+.prof-container {
     background-color: #f8f9fa;
     min-height: calc(100vh - 120px);
 }
 
-.profile-sidebar {
+.prof-sidebar {
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -13,12 +13,12 @@
     height: 100%;
 }
 
-.profile-sidebar:hover {
+.prof-sidebar:hover {
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     transform: translateY(-3px);
 }
 
-.avatar-wrapper {
+.prof-avatar-wrapper {
     width: 150px;
     height: 150px;
     margin: 0 auto 20px;
@@ -30,17 +30,17 @@
     position: relative;
 }
 
-.avatar-wrapper:hover {
+.prof-avatar-wrapper:hover {
     transform: scale(1.05);
 }
 
-.avatar-img {
+.prof-avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.avatar-placeholder {
+.prof-avatar-placeholder {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, #5a8f7b, #8fd3f4);
@@ -52,43 +52,43 @@
     font-weight: bold;
 }
 
-.profile-form-card {
+.prof-form-card {
     border-radius: 12px;
     border: none;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
 
-.profile-form-card:hover {
+.prof-form-card:hover {
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-.profile-form-card .card-header {
+.prof-form-card .card-header {
     background: linear-gradient(135deg, #5a8f7b, #8fd3f4);
     border-radius: 12px 12px 0 0 !important;
     padding: 1.2rem;
     color: white;
 }
 
-.profile-form .form-label {
+.prof-form .prof-form-label {
     font-weight: 600;
     color: #495057;
     margin-bottom: 0.5rem;
 }
 
-.profile-form .form-control {
+.prof-form .prof-form-control {
     border-radius: 8px;
     padding: 0.75rem 1rem;
     border: 2px solid #e9ecef;
     transition: all 0.3s;
 }
 
-.profile-form .form-control:focus {
+.prof-form .prof-form-control:focus {
     border-color: #5a8f7b;
     box-shadow: 0 0 0 0.25rem rgba(90, 143, 123, 0.25);
 }
 
-.profile-form .btn-primary {
+.prof-form .prof-btn-primary {
     background-color: #5a8f7b;
     border-color: #5a8f7b;
     padding: 0.6rem 1.5rem;
@@ -96,63 +96,63 @@
     transition: all 0.3s;
 }
 
-.profile-form .btn-primary:hover {
+.prof-form .prof-btn-primary:hover {
     background-color: #4a7f6b;
     border-color: #4a7f6b;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.btn-outline-primary {
+.prof-btn-outline-primary {
     border-color: #5a8f7b;
     color: #5a8f7b;
 }
 
-.btn-outline-primary:hover {
+.prof-btn-outline-primary:hover {
     background-color: #5a8f7b;
     color: white;
 }
 
-.social-links {
+.prof-social-links {
     font-size: 1.5rem;
     margin-top: 1.5rem;
 }
 
-.social-links a {
+.prof-social-links a {
     color: #6c757d;
     transition: all 0.3s;
     margin: 0 0.5rem;
 }
 
-.social-links a:hover {
+.prof-social-links a:hover {
     color: #5a8f7b;
     transform: translateY(-3px);
 }
 
 /* Адаптация */
 @media (max-width: 992px) {
-    .profile-sidebar {
+    .prof-sidebar {
         margin-bottom: 2rem;
     }
 }
 
 @media (max-width: 768px) {
-    .avatar-wrapper {
+    .prof-avatar-wrapper {
         width: 120px;
         height: 120px;
     }
 
-    .avatar-placeholder {
+    .prof-avatar-placeholder {
         font-size: 2rem;
     }
 }
 
 @media (max-width: 576px) {
-    .profile-form .col-md-6 {
+    .prof-form .col-md-6 {
         margin-bottom: 1rem;
     }
 
-    .profile-form .btn {
+    .prof-form .btn {
         width: 100%;
     }
 }

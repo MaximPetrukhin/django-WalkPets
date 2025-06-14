@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Написать отзыв</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Ваш отзыв</label>
+                            {{ form.text }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Оценка (1-5 звезд)</label>
+                            <div class="d-flex align-items-center">
+                                {{ form.rating }}
+                                <div class="ms-3">
+                                    <div class="star-rating">
+                                        {% for i in "12345" %}
+                                        <i class="bi bi-star{% if i|add:0 <= form.rating.value|default:5 %}fill{% endif %}"
+                                           data-value="{{ i }}"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating i');
+    const ratingInput = document.getElementById('id_rating');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            ratingInput.value = value;
+
+            stars.forEach((s, index) => {
+                if (index < value) {
+                    s.classList.add('bi-star-fill');
+                    s.classList.remove('bi-star');
+                } else {
+                    s.classList.add('bi-star');
+                    s.classList.remove('bi-star-fill');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
