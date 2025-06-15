@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Category, Topic, Post
 from .forms import TopicForm, PostForm
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -113,6 +114,18 @@ class AllTopicsView(ListView):
 
 @require_POST
 @login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.user == post.author or request.user.is_superuser:
+        topic_id = post.topic.id  # Сохраняем ID темы перед удалением
+        post.delete()
+        messages.success(request, 'Пост успешно удалён.')
+        return redirect('forum:topic_detail', pk=topic_id)
+    else:
+        messages.error(request, 'У вас нет прав на удаление этого поста.')
+        return redirect('forum:topic_detail', pk=post.topic.id)
+
 def like_topic(request, pk):
     try:
         topic = get_object_or_404(Topic, pk=pk)

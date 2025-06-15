@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf import settings
 import requests
+from django.contrib import messages
 from .models import Region, PetFriendlyPlace, PetFriendlyPlaceSubmission
 from .forms import RegionSelectForm, PetFriendlyPlaceSubmissionForm
 
@@ -17,11 +18,13 @@ def select_region(request):
     else:
         form = RegionSelectForm()
 
-    return render(request, 'wpzona/select_region.html', {'form': form})
+    return render(request, 'wpzona/select_region.html', {
+        'form': form,
+        'title': 'Выбор региона'
+    })
 
 
 def wpzona(request):
-    # Проверяем, выбран ли регион
     region_id = request.session.get('selected_region_id')
     if not region_id:
         return redirect('wpzona:select_region')
@@ -29,9 +32,10 @@ def wpzona(request):
     try:
         region = Region.objects.get(id=region_id)
     except Region.DoesNotExist:
+        messages.error(request, 'Выбранный регион не найден')
         return redirect('wpzona:select_region')
 
-    # Получаем погоду для региона
+    # Weather API call
     weather_data = None
     try:
         weather_response = requests.get(
@@ -42,10 +46,10 @@ def wpzona(request):
         )
         if weather_response.status_code == 200:
             weather_data = weather_response.json()
-    except requests.RequestException as e:
-        print(f"Ошибка при запросе погоды: {e}")
+    except requests.RequestException:
+        messages.warning(request, 'Не удалось получить данные о погоде')
 
-    # Обработка формы добавления места
+    # Handle place submission
     if request.method == 'POST' and request.user.is_authenticated:
         form = PetFriendlyPlaceSubmissionForm(request.POST, request.FILES)
         if form.is_valid():
@@ -53,12 +57,13 @@ def wpzona(request):
             submission.user = request.user
             submission.region = region
             submission.save()
+            messages.success(request, 'Ваше предложение отправлено на модерацию!')
             return redirect('wpzona:wpzona')
     else:
         form = PetFriendlyPlaceSubmissionForm()
 
-    # Получаем одобренные места для региона
-    places = PetFriendlyPlace.objects.filter(submission__region=region)
+    # Get approved places
+    places = PetFriendlyPlace.objects.filter(submission__region=region).select_related('submission')
 
     context = {
         'title': f'WPzona - {region.name}',
@@ -72,5 +77,22 @@ def wpzona(request):
 
 @staff_member_required
 def approve_submission(request, submission_id):
-    # Здесь должна быть логика одобрения заявки
-    pass
+    try:
+        submission = PetFriendlyPlaceSubmission.objects.get(id=submission_id)
+        if submission.status != 'approved':
+            submission.status = 'approved'
+            submission.save()
+
+            # Create approved place
+            PetFriendlyPlace.objects.create(
+                submission=submission,
+                latitude=submission.region.latitude,  # В реальном приложении нужно получать координаты адреса
+                longitude=submission.region.longitude
+            )
+            messages.success(request, 'Место успешно одобрено!')
+        else:
+            messages.info(request, 'Это место уже было одобрено ранее')
+    except PetFriendlyPlaceSubmission.DoesNotExist:
+        messages.error(request, 'Заявка не найдена')
+
+    return redirect('admin:wpzona_petfriendlyplacesubmission_changelist')

@@ -151,6 +151,20 @@ class UserProfileForm(UserChangeForm):
             'image': AvatarWidget()
         }
 
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get('birth_date')
+        # Если поле пустое, возвращаем None
+        return birth_date if birth_date else None
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Явно сохраняем дату рождения
+        user.birth_date = self.cleaned_data['birth_date']
+        if commit:
+            user.save()
+        return user
+
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.birth_date:

@@ -5,8 +5,14 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.core.exceptions import PermissionDenied
 from .forms import UserLoginForm, UserRegistrationForm, UserProfileForm, ReviewForm
-from .models import Review, User
-from django.shortcuts import get_object_or_404, redirect
+from .models import Review
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
+
+
 
 def login(request):
     if request.user.is_authenticated:
@@ -50,25 +56,34 @@ def register(request):
 
 @login_required
 def profile(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+    user = request.user
 
+    if request.method == 'POST':
         if 'delete_avatar' in request.POST:
-            if request.user.image:
-                default_storage.delete(request.user.image.path)
-                request.user.image = None
-                request.user.save()
+            if user.image:
+                default_storage.delete(user.image.path)
+                user.image = None
+                user.save()
                 messages.success(request, 'Аватар удалён!')
             return redirect('users:profile')
 
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль обновлён!')
+            user = form.save(commit=False)
+            # Явно сохраняем дату рождения
+            user.birth_date = form.cleaned_data['birth_date']
+            user.save()
+            messages.success(request, 'Профиль успешно обновлён!')
             return redirect('users:profile')
-        return render(request, 'users/profile.html', {'form': form})
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
+    else:
+        form = UserProfileForm(instance=user)
 
-    form = UserProfileForm(instance=request.user)
-    return render(request, 'users/profile.html', {'form': form})
+    return render(request, 'users/profile.html', {
+        'form': form,
+        'user': user
+    })
 
 
 @login_required
@@ -81,6 +96,8 @@ def create_review(request):
             review.save()
             messages.success(request, 'Ваш отзыв успешно опубликован!')
             return redirect('users:reviews')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
     else:
         form = ReviewForm()
 
@@ -91,26 +108,20 @@ def create_review(request):
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
 
-    # Проверяем, является ли пользователь автором отзыва или суперпользователем
     if not (request.user == review.author or request.user.is_superuser):
         raise PermissionDenied("Вы не можете удалить этот отзыв")
 
-    review.delete()
-    messages.success(request, 'Отзыв успешно удален!')
-    return redirect('users:reviews')
+    if request.method == 'POST':
+        review.delete()
+        messages.success(request, 'Отзыв успешно удалён!')
+        return redirect('users:reviews')
+
+    return render(request, 'users/confirm_delete.html', {'review': review})
 
 
 def reviews_list(request):
     reviews = Review.objects.filter(is_published=True).order_by('-created_at')
     return render(request, 'users/reviews_list.html', {'reviews': reviews})
-
-
-def top_reviews(request):
-    top_reviews = Review.objects.filter(
-        is_published=True,
-        rating__gte=4
-    ).order_by('-created_at')[:5]
-    return {'top_reviews': top_reviews}
 
 
 def logout(request):

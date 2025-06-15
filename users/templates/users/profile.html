@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 {% endblock %}
@@ -15,31 +16,50 @@
                     <div class="card-body text-center">
                         <div class="prof-avatar-wrapper mb-3">
                             {% if user.image %}
-                                <img src="{{ user.image.url }}" class="prof-avatar-img" alt="Аватар">
+                            <img src="{{ user.image.url }}" class="prof-avatar-img" alt="Аватар">
                             {% else %}
-                                <div class="prof-avatar-placeholder">{{ user.get_initials }}</div>
+                            <div class="prof-avatar-placeholder">{{ user.get_initials }}</div>
                             {% endif %}
                         </div>
                         <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
                         <p class="text-muted mb-3">@{{ user.username }}</p>
 
-                        <form method="post" enctype="multipart/form-data" class="mb-3">
+                        <form method="post" enctype="multipart/form-data" action="{% url 'users:profile' %}"
+                              id="avatar-form">
                             {% csrf_token %}
+                            <input type="hidden" name="first_name" value="{{ form.first_name.value|default:'' }}">
+                            <input type="hidden" name="last_name" value="{{ form.last_name.value|default:'' }}">
+                            <input type="hidden" name="phone" value="{{ form.phone.value|default:'' }}">
+                            <input type="hidden" name="birth_date"
+                                   value="{{ user.birth_date|date:'Y-m-d'|default:'' }}">
+
                             <label class="btn prof-btn-outline-primary btn-sm mb-2">
-                                <i class="bi bi-camera me-1"></i>Сменить аватар
-                                <input type="file" name="image" accept="image/*" hidden>
+                                <i class="bi bi-camera me-1"></i> Сменить аватар
+                                <input type="file" name="image" accept="image/*" class="d-none"
+                                       onchange="document.getElementById('avatar-form').submit()">
                             </label>
                             {% if user.image %}
-                                <button type="submit" name="delete_avatar" class="btn prof-btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash me-1"></i>Удалить
-                                </button>
+                            <button type="submit" name="delete_avatar" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash me-1"></i> Удалить
+                            </button>
                             {% endif %}
                         </form>
 
                         <div class="prof-social-links">
-                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Facebook"><i class="bi bi-facebook"></i></a>
-                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Instagram"><i class="bi bi-instagram"></i></a>
-                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Telegram"><i class="bi bi-telegram"></i></a>
+                            <!-- ВКонтакте -->
+                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="ВКонтакте">
+                                <i class="bi bi-vk"></i>
+                            </a>
+
+                            <!-- Instagram -->
+                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+
+                            <!-- Telegram -->
+                            <a href="#" class="text-muted" data-bs-toggle="tooltip" title="Telegram">
+                                <i class="bi bi-telegram"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -49,61 +69,75 @@
             <div class="col-lg-8">
                 <div class="prof-form-card card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Настройки профиля</h5>
+                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i> Настройки профиля</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post">
+                        {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="prof-form-label">Имя</label>
-                                    {{ form.first_name }}
+                                    <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}"
+                                           class="form-control {% if form.first_name.errors %}is-invalid{% endif %}">
                                     {% if form.first_name.errors %}
-                                        <div class="prof-invalid-feedback">
-                                            {{ form.first_name.errors|join:", " }}
-                                        </div>
+                                    <div class="invalid-feedback">
+                                        {{ form.first_name.errors|join:", " }}
+                                    </div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6">
                                     <label class="prof-form-label">Фамилия</label>
-                                    {{ form.last_name }}
+                                    <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}"
+                                           class="form-control {% if form.last_name.errors %}is-invalid{% endif %}">
                                     {% if form.last_name.errors %}
-                                        <div class="prof-invalid-feedback">
-                                            {{ form.last_name.errors|join:", " }}
-                                        </div>
+                                    <div class="invalid-feedback">
+                                        {{ form.last_name.errors|join:", " }}
+                                    </div>
                                     {% endif %}
                                 </div>
                                 <div class="col-md-6">
                                     <label class="prof-form-label">Email</label>
-                                    {{ form.email }}
-                                    <small class="prof-form-text">Изменить email можно через поддержку</small>
-                                    {% if form.email.errors %}
-                                        <div class="prof-invalid-feedback">
-                                            {{ form.email.errors|join:", " }}
-                                        </div>
-                                    {% endif %}
+                                    <input type="email" name="email" value="{{ form.email.value|default:'' }}"
+                                           class="form-control" readonly>
+                                    <small class="form-text">Изменить email можно через поддержку</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="prof-form-label">Телефон</label>
-                                    {{ form.phone }}
+                                    <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}"
+                                           class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                                           placeholder="+7 (___) ___ __ __">
                                     {% if form.phone.errors %}
-                                        <div class="prof-invalid-feedback">
-                                            {{ form.phone.errors|join:", " }}
-                                        </div>
+                                    <div class="invalid-feedback">
+                                        {{ form.phone.errors|join:", " }}
+                                    </div>
                                     {% endif %}
                                 </div>
                                 <div class="col-12">
                                     <label class="prof-form-label">Дата рождения</label>
-                                    {{ form.birth_date }}
+                                    <input type="date" name="birth_date"
+                                           value="{{ user.birth_date|date:'Y-m-d'|default:'' }}"
+                                           class="form-control {% if form.birth_date.errors %}is-invalid{% endif %}">
                                     {% if form.birth_date.errors %}
-                                        <div class="prof-invalid-feedback">
-                                            {{ form.birth_date.errors|join:", " }}
-                                        </div>
+                                    <div class="invalid-feedback">
+                                        {{ form.birth_date.errors|join:", " }}
+                                    </div>
                                     {% endif %}
                                 </div>
                                 <div class="col-12 mt-4">
                                     <button type="submit" name="save_profile" class="btn prof-btn-primary">
-                                        <i class="bi bi-check-circle me-1"></i>Сохранить изменения
+                                        <i class="bi bi-check-circle me-1"></i> Сохранить изменения
                                     </button>
                                 </div>
                             </div>
@@ -116,6 +150,6 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/profile_1.js' %}"></script>
-{% endblock %}
+<!--{% block extra_js %}-->
+<!--<script src="{% static 'js/phone.js' %}"></script>-->
+<!--{% endblock %}-->

@@ -2,9 +2,10 @@
 {% load static %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <link rel="stylesheet" href="{% static 'css/wpzona.css' %}">
+<link rel="stylesheet" href="{% static 'css/weather.css' %}">
 {% endblock %}
-
 
 {% block content %}
 <div class="wpzona-container">
@@ -13,31 +14,33 @@
         Регион не выбран. <a href="{% url 'wpzona:select_region' %}">Выберите регион</a>.
     </div>
     {% else %}
-    <h1>WPzona - {{ region.name }}</h1>
-    <p class="text-center mb-4">Pet-friendly места в выбранном регионе</p>
+    <h1 class="page-title">WPzona - {{ region.name }}</h1>
+    <p class="page-subtitle">Pet-friendly места в выбранном регионе</p>
 
-    <!-- Блок погоды -->
+    <!-- Weather Block -->
     <div class="weather-card">
         <h2><i class="bi bi-cloud-sun"></i> Погода в {{ region.name }}</h2>
         {% if weather %}
-        <div class="weather-details">
-            <img src="http://openweathermap.org/img/wn/{{ weather.weather.0.icon }}@2x.png" alt="Weather icon"
-                 class="weather-icon">
-            <div>
+        <div class="weather-content">
+            <div class="weather-icon-container">
+                <img src="http://openweathermap.org/img/wn/{{ weather.weather.0.icon }}@2x.png"
+                     alt="Weather icon" class="weather-icon">
                 <div class="weather-temp">{{ weather.main.temp|floatformat:0 }}°C</div>
-                <div class="weather-desc">{{ weather.weather.0.description|capfirst }}</div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <p><i class="bi bi-droplet"></i> Влажность: {{ weather.main.humidity }}%</p>
-            </div>
-            <div class="col-md-4">
-                <p><i class="bi bi-wind"></i> Ветер: {{ weather.wind.speed }} м/с</p>
-            </div>
-            <div class="col-md-4">
-                <p><i class="bi bi-thermometer"></i> Ощущается как: {{ weather.main.feels_like|floatformat:0 }}°C
-                </p>
+            <div class="weather-desc">{{ weather.weather.0.description|capfirst }}</div>
+            <div class="weather-details">
+                <div class="detail-item">
+                    <i class="bi bi-droplet"></i>
+                    <span>Влажность: {{ weather.main.humidity }}%</span>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-wind"></i>
+                    <span>Ветер: {{ weather.wind.speed }} м/с</span>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-thermometer"></i>
+                    <span>Ощущается как: {{ weather.main.feels_like|floatformat:0 }}°C</span>
+                </div>
             </div>
         </div>
         {% else %}
@@ -47,23 +50,40 @@
         {% endif %}
     </div>
 
-    <!-- Блок карты -->
+    <!-- Map Block -->
     <div class="map-container">
         <h2><i class="bi bi-map"></i> Карта pet-friendly мест</h2>
-        <div id="petMap"></div>
+        <div id="petMap" class="map-view"></div>
     </div>
 
-    <!-- Форма для добавления мест -->
+    <!-- Place Form -->
     {% if user.is_authenticated %}
-    <div class="place-form">
-        <h3><i class="bi bi-plus-circle"></i> Предложить новое место</h3>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-send"></i> Отправить на модерацию
-            </button>
-        </form>
+    <div class="place-form card">
+        <div class="card-body">
+            <h3 class="card-title"><i class="bi bi-plus-circle"></i> Предложить новое место</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                </div>
+                <div class="form-group">
+                    {{ form.address.label_tag }}
+                    {{ form.address }}
+                </div>
+                <div class="form-group">
+                    {{ form.photo.label_tag }}
+                    {{ form.photo }}
+                </div>
+                <button type="submit" class="btn btn-primary submit-btn">
+                    <i class="bi bi-send"></i> Отправить на модерацию
+                </button>
+            </form>
+        </div>
     </div>
     {% else %}
     <div class="alert alert-info">
@@ -71,17 +91,20 @@
     </div>
     {% endif %}
 
-    <!-- Список мест -->
+    <!-- Places List -->
     <div class="place-list">
         <h3><i class="bi bi-geo-alt"></i> Pet-friendly места в {{ region.name }}</h3>
         {% if places %}
-        <div class="row">
+        <div class="places-grid">
             {% for place in places %}
-            <div class="col-md-6">
-                <div class="place-item">
-                    <h5>{{ place.submission.name }}</h5>
-                    <p>{{ place.submission.description }}</p>
-                    <p class="text-muted"><small>{{ place.submission.address }}</small></p>
+            <div class="place-item card">
+                <div class="card-body">
+                    <h5 class="place-title">{{ place.submission.name }}</h5>
+                    <p class="place-description">{{ place.submission.description }}</p>
+                    <p class="place-address"><small>{{ place.submission.address }}</small></p>
+                    {% if place.submission.photo %}
+                    <img src="{{ place.submission.photo.url }}" class="place-photo" alt="{{ place.submission.name }}">
+                    {% endif %}
                     <button class="btn btn-sm btn-outline-secondary view-on-map"
                             data-lat="{{ place.latitude }}"
                             data-lng="{{ place.longitude }}">
@@ -105,13 +128,16 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        {% if region %}
+        // Initialize map
         const map = L.map('petMap').setView([{{ region.latitude }}, {{ region.longitude }}], 13);
 
+        // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
 
-        // Добавление маркеров
+        // Add markers for places
         {% for place in places %}
         L.marker([{{ place.latitude }}, {{ place.longitude }}]).addTo(map)
             .bindPopup(`
@@ -124,14 +150,24 @@
             `);
         {% endfor %}
 
-        // Обработка кнопок "Показать на карте"
+        // Handle "Show on map" buttons
         document.querySelectorAll('.view-on-map').forEach(btn => {
             btn.addEventListener('click', function() {
                 const lat = parseFloat(this.dataset.lat);
                 const lng = parseFloat(this.dataset.lng);
                 map.flyTo([lat, lng], 15);
+
+                // Open popup if available
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        if (layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
+                            layer.openPopup();
+                        }
+                    }
+                });
             });
         });
+        {% endif %}
     });
 </script>
 {% endblock %}

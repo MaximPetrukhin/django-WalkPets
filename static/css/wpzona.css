@@ -1,153 +1,182 @@
-/* Стили для страницы wpzona */
-.wpz-container {
-  background-color: var(--bg-white);
-  border-radius: var(--border-radius);
-  padding: 30px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 40px;
-  border: 3px solid;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+/* Base Styles */
+.wpzona-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Карточка погоды */
-.wpz-weather-card {
-  padding: 20px;
-  background: linear-gradient(135deg, var(--bg-light), #e9ecef);
-  border-radius: 10px;
-  margin-bottom: 30px;
-  box-shadow: var(--shadow-sm);
-  border-left: 4px solid var(--primary-color);
+.page-title {
+    color: #343a40;
+    margin-bottom: 5px;
+    text-align: center;
 }
 
-.wpz-weather-icon {
-  width: 60px;
-  height: 60px;
-  margin-right: 15px;
+.page-subtitle {
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-.wpz-weather-details {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
+/* Weather Card */
+.weather-card {
+    background: linear-gradient(135deg, #5a8f7b, #343a40);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.wpz-weather-temp {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: var(--text-dark);
+.weather-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.wpz-weather-desc {
-  font-size: 1.2rem;
+.weather-icon-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
-.wpz-weather-card i {
-  color: var(--primary-color);
-  margin-right: 8px;
+.weather-icon {
+    width: 80px;
+    height: 80px;
+    margin-right: 15px;
 }
 
-/* Карта */
-#wpz-petMap {
-  height: 500px;
-  width: 100%;
-  border-radius: 10px;
-  border: 2px solid var(--primary-color);
-  margin: 20px 0;
+.weather-temp {
+    font-size: 2.5rem;
+    font-weight: bold;
 }
 
-.wpz-leaflet-container {
-  background: var(--bg-light);
+.weather-desc {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    text-transform: capitalize;
 }
 
-.wpz-leaflet-control a {
-  color: var(--primary-color);
-  font-size: 1.2rem;
+.weather-details {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
 }
 
-.wpz-leaflet-control a:hover {
-  background-color: var(--bg-light);
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.wpz-leaflet-popup-content h3 {
-  color: var(--primary-color);
-  font-size: 1.2rem;
+/* Map Styles */
+.map-container {
+    margin: 30px 0;
 }
 
-/* Форма */
-.wpz-place-form {
-  background-color: var(--bg-light);
-  padding: 25px;
-  border-radius: 10px;
-  margin-top: 30px;
-  border: 1px solid #dee2e6;
+#petMap {
+    height: 500px;
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
-.wpz-place-form label {
-  font-weight: 600;
-  color: var(--text-dark);
+/* Place Form */
+.place-form {
+    margin: 30px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.wpz-place-form .form-control {
-  background-color: white;
-  border: 1px solid #ced4da;
+.form-group {
+    margin-bottom: 20px;
 }
 
-.wpz-place-form .form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.25rem rgba(90, 143, 123, 0.25);
+.form-group label {
+    font-weight: 500;
+    color: #495057;
 }
 
-.wpz-place-form .btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
 }
 
-.wpz-place-form .btn-primary:hover {
-  background-color: var(--primary-color-dark, #4a7f6b);
-  box-shadow: var(--shadow-sm);
+.submit-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-/* Список мест */
-.wpz-place-item {
-  background-color: white;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  border-left: 3px solid var(--primary-color);
+/* Places List */
+.place-list {
+    margin-top: 40px;
 }
 
-.wpz-place-item:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+.places-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
-.wpz-place-item h5 {
-  color: var(--text-dark);
-  font-weight: 600;
+.place-item {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
 
-.wpz-place-item .btn-outline-secondary {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+.place-item:hover {
+    transform: translateY(-5px);
 }
 
-.wpz-place-item .btn-outline-secondary:hover {
-  background-color: var(--primary-color);
-  color: white;
+.place-title {
+    color: #343a40;
+    margin-bottom: 10px;
 }
 
-/* Адаптивность */
+.place-description {
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.place-address {
+    color: #adb5bd;
+    margin-bottom: 15px;
+}
+
+.place-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.view-on-map {
+    margin-top: 10px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  #wpz-petMap { height: 350px; }
-  .wpz-weather-details { flex-direction: column; align-items: flex-start; }
-  .wpz-weather-icon { margin-bottom: 10px; margin-right: 0; }
-  .wpz-container { padding: 20px; }
-  .wpz-place-form { padding: 15px; }
-}
+    .weather-details {
+        flex-direction: column;
+        gap: 10px;
+    }
 
-@media (max-width: 576px) {
-  #wpz-petMap { height: 300px; }
-  .wpz-weather-temp { font-size: 2rem; }
-  .wpz-weather-desc { font-size: 1rem; }
+    .places-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #petMap {
+        height: 300px;
+    }
 }
