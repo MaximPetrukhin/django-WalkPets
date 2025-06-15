@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <link rel="stylesheet" href="{% static 'css/wpzona.css' %}">
 <link rel="stylesheet" href="{% static 'css/weather.css' %}">
 {% endblock %}
@@ -15,11 +14,11 @@
     </div>
     {% else %}
     <h1 class="page-title">WPzona - {{ region.name }}</h1>
-    <p class="page-subtitle">Pet-friendly места в выбранном регионе</p>
+    <!--    <p class="page-subtitle">Pet-friendly места в выбранном регионе</p>-->
 
     <!-- Weather Block -->
     <div class="weather-card">
-        <h2><i class="bi bi-cloud-sun"></i> Погода в {{ region.name }}</h2>
+        <h2><i class="bi bi-cloud-sun"></i> Погода в городе {{ region.name }}</h2>
         {% if weather %}
         <div class="weather-content">
             <div class="weather-icon-container">
@@ -53,7 +52,15 @@
     <!-- Map Block -->
     <div class="map-container">
         <h2><i class="bi bi-map"></i> Карта pet-friendly мест</h2>
-        <div id="petMap" class="map-view"></div>
+        <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2310.730618008196!2d39.72284867663053!3d54.60873807952492!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4149e21855c7c3cf%3A0xf47163a3271d8dbc!2z0KbQtdC90YLRgNCw0LvRjNC90YvQuSDQv9Cw0YDQuiDQutGD0LvRjNGC0YPRgNGLINC4INC-0YLQtNGL0YXQsA!5e0!3m2!1sru!2sru!4v1749993091952!5m2!1sru!2sru"
+                width="100%"
+                height="450"
+                style="border:0; border-radius: 10px;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
     </div>
 
     <!-- Place Form -->
@@ -61,28 +68,40 @@
     <div class="place-form card">
         <div class="card-body">
             <h3 class="card-title"><i class="bi bi-plus-circle"></i> Предложить новое место</h3>
+            {% if messages %}
+            <div class="messages-container mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
-                    {{ form.name.label_tag }}
-                    {{ form.name }}
-                </div>
-                <div class="form-group">
-                    {{ form.description.label_tag }}
-                    {{ form.description }}
-                </div>
-                <div class="form-group">
-                    {{ form.address.label_tag }}
-                    {{ form.address }}
-                </div>
-                <div class="form-group">
-                    {{ form.photo.label_tag }}
-                    {{ form.photo }}
-                </div>
-                <button type="submit" class="btn btn-primary submit-btn">
-                    <i class="bi bi-send"></i> Отправить на модерацию
-                </button>
-            </form>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.address.label_tag }}
+                        {{ form.address }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.photo.label_tag }}
+                        {{ form.photo }}
+                    </div>
+                    <button type="submit" class="btn btn-primary submit-btn">
+                        <i class="bi bi-send"></i> Отправить на модерацию
+                    </button>
+                </form>
         </div>
     </div>
     {% else %}
@@ -105,11 +124,6 @@
                     {% if place.submission.photo %}
                     <img src="{{ place.submission.photo.url }}" class="place-photo" alt="{{ place.submission.name }}">
                     {% endif %}
-                    <button class="btn btn-sm btn-outline-secondary view-on-map"
-                            data-lat="{{ place.latitude }}"
-                            data-lng="{{ place.longitude }}">
-                        Показать на карте
-                    </button>
                 </div>
             </div>
             {% endfor %}
@@ -125,49 +139,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if region %}
-        // Initialize map
-        const map = L.map('petMap').setView([{{ region.latitude }}, {{ region.longitude }}], 13);
-
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-
-        // Add markers for places
-        {% for place in places %}
-        L.marker([{{ place.latitude }}, {{ place.longitude }}]).addTo(map)
-            .bindPopup(`
-                <h5>{{ place.submission.name|escapejs }}</h5>
-                <p>{{ place.submission.description|escapejs }}</p>
-                <small>{{ place.submission.address|escapejs }}</small>
-                {% if place.submission.photo %}
-                <img src="{{ place.submission.photo.url }}" style="max-width: 100%; margin-top: 10px;">
-                {% endif %}
-            `);
-        {% endfor %}
-
-        // Handle "Show on map" buttons
-        document.querySelectorAll('.view-on-map').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const lat = parseFloat(this.dataset.lat);
-                const lng = parseFloat(this.dataset.lng);
-                map.flyTo([lat, lng], 15);
-
-                // Open popup if available
-                map.eachLayer(layer => {
-                    if (layer instanceof L.Marker) {
-                        if (layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
-                            layer.openPopup();
-                        }
-                    }
-                });
-            });
-        });
-        {% endif %}
-    });
-</script>
+<!-- Удалены скрипты Leaflet, так как они больше не нужны -->
 {% endblock %}

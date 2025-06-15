@@ -135,23 +135,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#         },
-#     },
-# }
-#
-
 
 LOGIN_URL = 'users:login'
 
@@ -174,3 +157,4 @@ MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 OPENWEATHER_API_KEY = "174aea51ab36a4f548b80df73bd6e7cc"
 
 DATE_INPUT_FORMATS = ['%Y-%m-%d', '%d.%m.%Y']
+

@@ -57,7 +57,7 @@ def wpzona(request):
             submission.user = request.user
             submission.region = region
             submission.save()
-            messages.success(request, 'Ваше предложение отправлено на модерацию!')
+            messages.success(request, '✅ Ваше предложение успешно отправлено на модерацию! Спасибо за вклад в сообщество!')
             return redirect('wpzona:wpzona')
     else:
         form = PetFriendlyPlaceSubmissionForm()

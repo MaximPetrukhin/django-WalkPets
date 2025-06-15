@@ -22,7 +22,6 @@ from services.views import index, service_list, privacy_policy, terms_of_use, co
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name="index"),
@@ -33,6 +32,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('forum/', include('forum.urls')),
     path('wp-zona/', include('wpzona.urls')),
+
 
     # Аутентификация (совместимость со стандартными URL Django)
     path('accounts/login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
