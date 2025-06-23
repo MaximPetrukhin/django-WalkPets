@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Спасибо за заявку | WalkPets{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h1 class="mb-4">Спасибо за вашу заявку!</h1>
+            <p class="lead">Мы рассмотрим вашу анкету в ближайшее время и свяжемся с вами.</p>
+            <a href="{% url 'index' %}" class="btn btn-primary mt-3">Вернуться на главную</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

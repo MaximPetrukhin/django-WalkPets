@@ -51,6 +51,11 @@ class User(AbstractUser):
 
 
 class Review(models.Model):
+    REVIEW_TYPE_CHOICES = [
+        ('site', 'Отзыв о сайте'),
+        ('walker', 'Отзыв о выгульщике'),
+    ]
+
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
     text = models.TextField('Текст отзыва', max_length=1000)
     rating = models.PositiveSmallIntegerField(
@@ -58,8 +63,20 @@ class Review(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         default=5
     )
+    review_type = models.CharField(
+        'Тип отзыва',
+        max_length=10,
+        choices=REVIEW_TYPE_CHOICES,
+        default='site'
+    )
+    walker = models.ForeignKey(
+        'services.Walker',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='walker_reviews'
+    )
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
-    updated_at = models.DateTimeField('Дата обновления', auto_now=True)
     is_published = models.BooleanField('Опубликован', default=True)
 
     class Meta:

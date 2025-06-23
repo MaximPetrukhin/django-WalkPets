@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} | WalkPets{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="mb-4">{{ category.name }}</h1>
+
+            {% if category.image %}
+            <img src="{{ category.image.url }}" class="img-fluid rounded mb-4" alt="{{ category.name }}">
+            {% endif %}
+
+            <div class="bg-light p-4 rounded mb-4">
+                <p class="lead">{{ category.description }}</p>
+            </div>
+
+            <h2 class="mb-4">Наши услуги</h2>
+            <div class="row g-4">
+                {% for service in services %}
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        {% if service.image %}
+                        <img src="{{ service.image.url }}" class="card-img-top service-img" alt="{{ service.name }}">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center service-placeholder">
+                            <i class="bi bi-paw text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h3 class="card-title">{{ service.name }}</h3>
+                            <p class="card-text">{{ service.short_description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success">{{ service.price }} ₽</span>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Наши выгульщики</h3>
+                </div>
+                <div class="card-body">
+                    {% for walker in walkers %}
+                    <div class="d-flex mb-3">
+                        {% if walker.image %}
+                        <img src="{{ walker.image.url }}" class="rounded-circle me-3" width="60" height="60" alt="{{ walker.name }}">
+                        {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="bi bi-person text-muted" style="font-size: 1.5rem;"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1">{{ walker.name }}</h5>
+                            <p class="mb-1 small text-muted">
+                                <i class="bi bi-telephone"></i> {{ walker.phone }}
+                            </p>
+                            <div class="text-warning">
+                                {% for _ in "12345" %}
+                                    {% if forloop.counter <= walker.rating %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="text-muted small ms-1">({{ walker.experience }} лет опыта)</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'services:walker_list' %}" class="btn btn-primary w-100">Все выгульщики</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .service-img {
+        height: 180px;
+        object-fit: cover;
+    }
+    .service-placeholder {
+        height: 180px;
+    }
+</style>
+{% endblock %}

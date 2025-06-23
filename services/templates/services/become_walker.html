@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Стать выгульщиком | WalkPets{% endblock %}
+
+{% block extra_css %}
+<style>
+    .walker-form-card {
+        border: 2px solid #5a8f7b;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .walker-form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(90, 143, 123, 0.2);
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #5a8f7b, #3a6b56);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .form-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #5a8f7b;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #5a8f7b;
+        box-shadow: 0 0 0 0.25rem rgba(90, 143, 123, 0.25);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #5a8f7b, #3a6b56);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(90, 143, 123, 0.4);
+    }
+
+    .form-note {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+
+
+    .file-hint {
+        flex: 1;
+        color: #6c757d;
+        font-size: 0.9rem;
+        padding-left: 15px;
+        margin-left: 400px;
+    }
+
+
+
+    /* Стили для изображения предпросмотра */
+    .image-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #5a8f7b;
+        display: none;
+        margin: 0 auto 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    {% if messages %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3" style="color: #5a8f7b;">Стать выгульщиком</h1>
+                <p class="lead">Заполните анкету и присоединяйтесь к нашей команде профессиональных выгульщиков</p>
+            </div>
+
+            <div class="walker-form-card">
+                <div class="form-header">
+                    <h2><i class="bi bi-person-plus-fill me-2"></i>Анкета выгульщика</h2>
+                </div>
+
+                <div class="form-body">
+                    <form method="post" enctype="multipart/form-data" id="walkerForm">
+                        {% csrf_token %}
+
+                        <!-- Предпросмотр изображения -->
+                        <img id="imagePreview" class="image-preview" alt="Предпросмотр фото"/>
+
+                        <div class="form-group">
+                            <label for="id_image">Ваше фото:</label>
+                            {{ form.image }}
+                            <div class="file-hint">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Это фото будет отображаться в вашем профиле
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_name">Ваше имя:</label>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_phone">Телефон:</label>
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_experience">Опыт работы (лет):</label>
+                            {{ form.experience }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_description">О себе:</label>
+                            {{ form.description }}
+                            <small class="form-text text-muted">Расскажите о своем опыте с животными</small>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-submit btn-lg">
+                                <i class="bi bi-send-fill me-2"></i>Отправить заявку
+                            </button>
+                            <p class="form-note">
+                                После проверки модератором вы получите уведомление на указанные контакты
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Предпросмотр изображения перед загрузкой
+    document.getElementById('id_image').addEventListener('change', function(e) {
+        const preview = document.getElementById('imagePreview');
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Плавная валидация формы
+    document.getElementById('walkerForm').addEventListener('submit', function(e) {
+        const phoneInput = document.getElementById('id_phone');
+        if (!/^[\d\s\-\+\(\)]+$/.test(phoneInput.value)) {
+            e.preventDefault();
+            phoneInput.classList.add('is-invalid');
+            alert('Пожалуйста, введите корректный номер телефона');
+        }
+    });
+</script>
+{% endblock %}

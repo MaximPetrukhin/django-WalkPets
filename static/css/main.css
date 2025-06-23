@@ -721,7 +721,7 @@ body::before {
 }
 
 /* Star rating */
-.star-rating {
+/* .star-rating {
     font-size: 1.5rem;
     cursor: pointer;
 }
@@ -742,7 +742,7 @@ body::before {
 .testimonials .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
+}*/
 
 /* Стили для кнопки удаления */
 .btn-danger {
@@ -783,3 +783,61 @@ body::before {
   }
 }
 
+/* Стили для карточек категорий */
+.category-card {
+    transition: all 0.3s ease;
+    border: 2px solid #5a8f7b;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.category-img-container {
+    height: 200px;
+    overflow: hidden;
+}
+
+.category-img {
+    transition: transform 0.5s ease;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.category-card:hover .category-img {
+    transform: scale(1.05);
+}
+
+/* Стили для выгульщиков */
+.walker-card {
+    transition: all 0.3s ease;
+}
+
+.walker-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.walker-avatar {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    .category-img-container {
+        height: 150px;
+    }
+
+    .walker-avatar {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Добавьте в конец файла main.css */
+/* Star rating styles */

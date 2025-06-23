@@ -8,11 +8,17 @@ from django.utils.safestring import mark_safe
 import re
 from .models import Review
 
-
 User = get_user_model()
 
 
 class ReviewForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['text'].widget.attrs.update({
+            'placeholder': 'Ваш отзыв о выгульщике...'
+        })
+        self.fields['rating'].widget = forms.HiddenInput()  # Скрываем числовое поле, используем звезды
+
     class Meta:
         model = Review
         fields = ['text', 'rating']
@@ -20,18 +26,10 @@ class ReviewForm(forms.ModelForm):
             'text': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'Напишите ваш отзыв здесь...'
             }),
-            'rating': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'max': 5,
-                'type': 'number'
-            })
         }
         labels = {
             'text': 'Ваш отзыв',
-            'rating': 'Оценка (1-5 звезд)'
         }
 
 
@@ -47,6 +45,7 @@ class AvatarWidget(forms.ClearableFileInput):
         if attrs:
             default_attrs.update(attrs)
         super().__init__(attrs=default_attrs)
+
 
 class UserLoginForm(AuthenticationForm):
     """Форма входа с запоминанием пользователя"""
@@ -71,6 +70,7 @@ class UserLoginForm(AuthenticationForm):
         }),
         initial=True
     )
+
 
 class UserRegistrationForm(UserCreationForm):
     """Форма регистрации с дополнительной валидацией email"""
@@ -111,6 +111,7 @@ class UserRegistrationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise ValidationError("Пользователь с таким email уже существует")
         return email
+
 
 class UserProfileForm(UserChangeForm):
     """Форма редактирования профиля с кастомными полями"""
@@ -163,7 +164,6 @@ class UserProfileForm(UserChangeForm):
         if commit:
             user.save()
         return user
-
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

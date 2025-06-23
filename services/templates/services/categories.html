@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Категории услуг | WalkPets{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-5">Категории услуг</h1>
+
+    <div class="row g-4">
+        {% for category in categories %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <a href="{% if category.slug %}{% url 'services:category_detail' category.slug %}{% else %}#{% endif %}"
+                   class="text-decoration-none">
+
+                    {% if category.image %}
+                    <img src="{{ category.image.url }}" class="card-img-top category-img" alt="{{ category.name }}">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center category-placeholder">
+                        <i class="bi bi-paw text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body text-center">
+                        <h3 class="card-title text-primary">{{ category.name }}</h3>
+                        <p class="card-text text-muted">{{ category.description|truncatechars:100 }}</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="alert alert-info">
+                Категории временно недоступны. Пожалуйста, зайдите позже.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+        border: 2px solid #5a8f7b;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .category-img {
+        height: 200px;
+        object-fit: cover;
+    }
+    .category-placeholder {
+        height: 200px;
+    }
+</style>
+{% endblock %}

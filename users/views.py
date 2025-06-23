@@ -9,9 +9,7 @@ from .models import Review
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
-
 
 
 def login(request):
@@ -120,8 +118,40 @@ def delete_review(request, review_id):
 
 
 def reviews_list(request):
-    reviews = Review.objects.filter(is_published=True).order_by('-created_at')
-    return render(request, 'users/reviews_list.html', {'reviews': reviews})
+    # Отзывы о сайте
+    site_reviews = Review.objects.filter(
+        review_type='site',
+        is_published=True
+    ).order_by('-created_at')
+
+    # Отзывы о выгульщиках
+    walker_reviews = Review.objects.filter(
+        review_type='walker',
+        is_published=True
+    ).order_by('-created_at')
+
+    return render(request, 'users/reviews_list.html', {
+        'site_reviews': site_reviews,
+        'walker_reviews': walker_reviews
+    })
+
+
+@login_required
+def edit_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id)
+    if request.user != review.author:
+        raise PermissionDenied("Вы не можете редактировать этот отзыв")
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Отзыв успешно обновлён!')
+            return redirect('users:reviews')
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, 'users/edit_review.html', {'form': form})
 
 
 def logout(request):

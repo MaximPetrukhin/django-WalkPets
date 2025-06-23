@@ -2,65 +2,174 @@
 {% load static %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Написать отзыв</h4>
+<div class="container my-5">
+    <!-- Форма для добавления отзыва -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3>Оставить отзыв</h3>
+            <form method="post" id="review-form">
+                {% csrf_token %}
+
+                <!-- Звездный рейтинг -->
+                <div class="mb-3">
+                    <label class="form-label">Ваша оценка</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2"><i class="bi bi-star-fill"></i></label>
+
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1"><i class="bi bi-star-fill"></i></label>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Ваш отзыв</label>
-                            {{ form.text }}
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Оценка (1-5 звезд)</label>
-                            <div class="d-flex align-items-center">
-                                {{ form.rating }}
-                                <div class="ms-3">
-                                    <div class="star-rating">
-                                        {% for i in "12345" %}
-                                        <i class="bi bi-star{% if i|add:0 <= form.rating.value|default:5 %}fill{% endif %}"
-                                           data-value="{{ i }}"></i>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Отправить отзыв</button>
-                    </form>
+
+                <!-- Текст отзыва -->
+                <div class="mb-3">
+                    <textarea name="text" class="form-control" rows="4"
+                              placeholder="Ваш отзыв..." required></textarea>
                 </div>
+
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Отображение существующих отзывов -->
+    <div class="card">
+        <div class="card-body">
+            <h3>Отзывы</h3>
+
+            {% for review in reviews %}
+            <div class="mb-4 pb-3 border-bottom">
+                <!-- Рейтинг в звездах -->
+                <div class="star-rating-display mb-2">
+                    {% for i in "12345" %}
+                    <i class="bi bi-star-fill {% if forloop.counter <= review.rating %}text-warning{% else %}text-light{% endif %}"></i>
+                    {% endfor %}
+                </div>
+
+                <p>{{ review.text }}</p>
+                <small class="text-muted">
+                    {{ review.author.username }} • {{ review.created_at|date:"d.m.Y" }}
+                </small>
             </div>
+            {% endfor %}
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+<style>
+    /* Стили для интерактивного рейтинга */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    .star-rating input {
+        display: none;
+    }
+    .star-rating label {
+        font-size: 1.8rem;
+        color: #e0e0e0;
+        cursor: pointer;
+        padding: 0 3px;
+        transition: color 0.2s;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+    }
+
+    /* Стили для отображения рейтинга */
+    .star-rating-display i {
+        font-size: 1.3rem;
+        margin-right: 2px;
+    }
+    .text-warning {
+        color: #ffc107;
+    }
+    .text-light {
+        color: #e0e0e0;
+    }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('.star-rating i');
-    const ratingInput = document.getElementById('id_rating');
+    // Инициализация звездного рейтинга
+    const starRating = document.querySelector('.star-rating');
+    if (starRating) {
+        const stars = starRating.querySelectorAll('label');
+        const inputs = starRating.querySelectorAll('input');
 
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const value = this.getAttribute('data-value');
-            ratingInput.value = value;
+        // Обработка наведения на звезду
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const currentIndex = Array.from(stars).indexOf(this);
 
-            stars.forEach((s, index) => {
-                if (index < value) {
-                    s.classList.add('bi-star-fill');
-                    s.classList.remove('bi-star');
-                } else {
-                    s.classList.add('bi-star');
-                    s.classList.remove('bi-star-fill');
+                // Подсвечиваем текущую звезду и все предыдущие
+                stars.forEach((s, index) => {
+                    s.style.color = index >= currentIndex ? '#ffc107' : '#e0e0e0';
+                });
+            });
+
+            // Обработка клика
+            star.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input) {
+                    input.checked = true;
+
+                    // После выбора фиксируем подсветку
+                    const checkedIndex = Array.from(inputs).indexOf(input);
+                    stars.forEach((s, index) => {
+                        s.style.color = index >= checkedIndex ? '#ffc107' : '#e0e0e0';
+                    });
                 }
             });
         });
-    });
+
+        // Восстановление состояния при уходе курсора
+        starRating.addEventListener('mouseleave', function() {
+            const checkedInput = starRating.querySelector('input:checked');
+            if (checkedInput) {
+                const checkedIndex = Array.from(inputs).indexOf(checkedInput);
+                stars.forEach((s, index) => {
+                    s.style.color = index >= checkedIndex ? '#ffc107' : '#e0e0e0';
+                });
+            } else {
+                stars.forEach(s => s.style.color = '#e0e0e0');
+            }
+        });
+    }
+
+    // Валидация формы
+    const reviewForm = document.getElementById('review-form');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            const rating = this.querySelector('input[name="rating"]:checked');
+            const text = this.querySelector('textarea[name="text"]').value.trim();
+
+            if (!rating) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите оценку');
+                return false;
+            }
+
+            if (text.length < 10) {
+                e.preventDefault();
+                alert('Отзыв должен содержать минимум 10 символов');
+                return false;
+            }
+        });
+    }
 });
 </script>
 {% endblock %}
